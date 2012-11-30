@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            id="org.dcarew.pythontools.pyFile"
+            name="Python"
+            base-type="org.eclipse.core.runtime.text"
+            file-extensions="py"
+            default-charset="UTF-8"/>
+   </extension>
+
+</plugin>

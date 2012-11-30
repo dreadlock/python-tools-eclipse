@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.dcarew.pythontools.feature"
+      label="Python Tools for Eclipse"
+      version="0.1.0.qualifier"
+      provider-name="org.dcarew"
+      plugin="org.dcarew.pythontools.core">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <url>
+      <update label="Python Tools for Eclipse" url="http://python-tools-eclipse.googlecode.com/svn/trunk/org.dcarew.pythontools.updatesite/"/>
+   </url>
+
+   <plugin
+         id="org.dcarew.pythontools.core"
+         download-size="0"
+         install-size="0"
+         version="0.1.0.qualifier"
+         unpack="false"/>
+
+   <plugin
+         id="org.dcarew.pythontools.ui"
+         download-size="0"
+         install-size="0"
+         version="0.1.0.qualifier"
+         unpack="false"/>
+
+</feature>

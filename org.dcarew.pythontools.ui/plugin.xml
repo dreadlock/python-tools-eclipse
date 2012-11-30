@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.dcarew.pythontools.ui.preferences.PythonPreferencePage"
+            id="org.dcarew.pythontools.ui.preferences.mainPage"
+            name="Python">
+      </page>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.dcarew.pythontools.ui.editors.PythonEditor"
+            contributorClass="org.dcarew.pythontools.ui.editors.PythonEditorActionContributor"
+            extensions="py"
+            icon="icons/python_file.png"
+            id="org.dcarew.pythontools.ui.editors.python"
+            name="Python Editor">
+            <contentTypeBinding contentTypeId="org.dcarew.pythontools.pyFile">
+        </contentTypeBinding>
+      </editor>
+   </extension>
+
+</plugin>
