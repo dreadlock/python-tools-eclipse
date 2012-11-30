@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="org.dcarew.pythontools.feature">
+      <category name="Python Tools for Eclipse"/>
+   </feature>
+   <category-def name="Python Tools for Eclipse" label="Python Tools for Eclipse">
+      <description>Python Tools is an Eclipse plug-in that provides support for the Python language.
+
+https://code.google.com/p/python-tools-eclipse/
+Copyright (c) 2012 the Python Tools developers</description>
+   </category-def>
+</site>
