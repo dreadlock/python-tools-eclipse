@@ -2,9 +2,9 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Python Tools Core
 Bundle-SymbolicName: org.dcarew.pythontools.core;singleton:=true
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.1.1.qualifier
 Bundle-Activator: org.dcarew.pythontools.core.PythonCorePlugin
-Bundle-Vendor: org.dcarew
+Bundle-Vendor: Python Tools for Eclipse
 Require-Bundle: org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
