@@ -29,6 +29,12 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
   @Override
   public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch,
       IProgressMonitor monitor) throws CoreException {
+    String pythonPath = PythonCorePlugin.getPlugin().getPythonPath();
+
+    if (pythonPath == null) {
+      throw newDebugException("No path for the python interpreter specified in the Preferences dialog.");
+    }
+
     PythonLaunchConfigWrapper wrapper = new PythonLaunchConfigWrapper(configuration);
     IResource resource = wrapper.getResource();
 
@@ -41,7 +47,7 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
 
     List<String> commandsList = new ArrayList<String>();
 
-    commandsList.add("python");
+    commandsList.add(pythonPath);
     //commandsList.addAll(Arrays.asList(launchConfig.getVmArgumentsAsArray()));
     commandsList.add(scriptPath);
     //commandsList.addAll(Arrays.asList(launchConfig.getArgumentsAsArray()));

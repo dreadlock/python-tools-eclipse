@@ -30,7 +30,6 @@ public class PythonLaunchConfigurationTab extends AbstractLaunchConfigurationTab
 
   @Override
   public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-    // TODO Auto-generated method stub
     PythonLaunchConfigWrapper wrapper = new PythonLaunchConfigWrapper(configuration);
     
     
@@ -38,7 +37,6 @@ public class PythonLaunchConfigurationTab extends AbstractLaunchConfigurationTab
 
   @Override
   public void initializeFrom(ILaunchConfiguration configuration) {
-    // TODO Auto-generated method stub
     PythonLaunchConfigWrapper wrapper = new PythonLaunchConfigWrapper(configuration);
 
     

@@ -84,19 +84,23 @@ public class PythonBuilder implements IResourceChangeListener {
     for (IFile file : files) {
       MarkerUtils.clearMarkers(file);
 
-      ProcessRunner runner = new ProcessRunner(getCwd(file), "/Users/devoncarew/pythonpath/pylint",
-          "-f", "parseable", "-r", "n", "-i", "y", "--indent-string=\"  \"", file.getName());
+      String pylintPath = PythonCorePlugin.getPlugin().getPylintPath();
 
-      try {
-        int exit = runner.execute();
+      if (pylintPath != null) {
+        try {
+          ProcessRunner runner = new ProcessRunner(getCwd(file), pylintPath, "-f", "parseable",
+              "-r", "n", "-i", "y", "--indent-string=\"  \"", file.getName());
 
-        System.out.println("pylint exit with code " + exit);
+          int exit = runner.execute();
 
-        if (exit > 0 && exit < 32) {
-          processOutput(file, runner.getStdout());
+          System.out.println("pylint exit with code " + exit);
+
+          if (exit > 0 && exit < 32) {
+            processOutput(file, runner.getStdout());
+          }
+        } catch (IOException e) {
+          PythonCorePlugin.logError(e);
         }
-      } catch (IOException e) {
-        PythonCorePlugin.logError(e);
       }
     }
   }
@@ -158,11 +162,11 @@ public class PythonBuilder implements IResourceChangeListener {
 
     // TODO: use typecode to set the severity, and filter some stuff
     int severity = IMarker.SEVERITY_WARNING;
-    
+
     if (typeCode.startsWith("E") || typeCode.startsWith("F")) {
       severity = IMarker.SEVERITY_ERROR;
     }
-    
+
     MarkerUtils.createMarker(severity, file, line, typeCode + ": " + message);
   }
 
