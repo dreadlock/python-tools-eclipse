@@ -2,7 +2,7 @@
 <feature
       id="org.dcarew.pythontools.feature"
       label="Python Tools for Eclipse"
-      version="0.1.1.qualifier"
+      version="0.1.2.qualifier"
       provider-name="Python Tools for Eclipse"
       plugin="org.dcarew.pythontools.core">
 
@@ -26,14 +26,14 @@
          id="org.dcarew.pythontools.core"
          download-size="0"
          install-size="0"
-         version="0.1.1.qualifier"
+         version="0.1.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.dcarew.pythontools.ui"
          download-size="0"
          install-size="0"
-         version="0.1.1.qualifier"
+         version="0.1.2.qualifier"
          unpack="false"/>
 
 </feature>

@@ -2,14 +2,31 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-   <extension
-         point="org.eclipse.core.contenttype.contentTypes">
+   <extension point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             id="org.dcarew.pythontools.pyFile"
             name="Python"
             base-type="org.eclipse.core.runtime.text"
             file-extensions="py"
             default-charset="UTF-8"/>
+   </extension>
+
+   <extension point="org.eclipse.core.resources.markers"
+         id="pythonMarker" name="Python Problem">
+      <super type="org.eclipse.core.resources.problemmarker"/>
+      <persistent value="true"/>
+   </extension>
+
+   <!-- launch config -->
+   
+   <extension point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="org.dcarew.pythontools.core.launching.PythonLaunchConfigurationDelegate"
+            delegateName="Python Launcher"
+            id="org.dcarew.pythontools.launchConfig"
+            modes="run,debug"
+            name="Python Application">
+      </launchConfigurationType>
    </extension>
 
 </plugin>

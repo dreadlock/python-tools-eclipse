@@ -25,4 +25,50 @@
       </editor>
    </extension>
 
+   <!-- launch config -->
+   
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="org.dcarew.pythontools.launchConfig"
+            icon="icons/python_16.png"
+            id="org.dcarew.pythontools.launchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+   </extension>
+   
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="org.dcarew.pythontools.ui.launching.PythonLaunchConfigurationTabGroup"
+            id="org.dcarew.pythontools.launchConfigurationTabGroup"
+            type="org.dcarew.pythontools.launchConfig">
+      </launchConfigurationTabGroup>
+   </extension>
+   
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="org.dcarew.pythontools.ui.launching.PythonLaunchShortcut"
+            icon="icons/python_16.png"
+            id="org.dcarew.pythontools.ui.launching.shortcut"
+            label="Python Application"
+            modes="run,debug">
+            <description description="Executes a Python program" mode="run"/>
+            <description description="Debugs a Python program" mode="debug"/>
+            <contextualLaunch>
+               <enablement>
+                  <with variable="selection">
+                     <count value="1"/>
+                     <iterate>
+                        <or>
+                           <test property="org.eclipse.debug.ui.matchesPattern" value="*.py"/>
+                        </or>
+                     </iterate>
+                  </with>
+               </enablement>
+            </contextualLaunch>
+         <configurationType id="org.dcarew.pythontools.launchConfig"/>
+      </shortcut>
+   </extension>
+
 </plugin>
