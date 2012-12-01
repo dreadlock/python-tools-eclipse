@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Python Tools UI Plugin
 Bundle-SymbolicName: org.dcarew.pythontools.ui;singleton:=true
-Bundle-Version: 0.1.1.qualifier
+Bundle-Version: 0.1.2.qualifier
 Bundle-Activator: org.dcarew.pythontools.ui.PythonUIPlugin
 Bundle-Vendor: Python Tools for Eclipse
 Require-Bundle: org.eclipse.ui,
@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.ui.editors,
  org.eclipse.jface.text,
- org.eclipse.ui.views
+ org.eclipse.ui.views,
+ org.eclipse.debug.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dcarew.pythontools.ui

@@ -1,5 +1,7 @@
 package org.dcarew.pythontools.ui;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -21,13 +23,15 @@ public class PythonUIPlugin extends AbstractUIPlugin {
 	  
 	}
 
-	public void start(BundleContext context) throws Exception {
+	@Override
+  public void start(BundleContext context) throws Exception {
 		super.start(context);
 		
 		plugin = this;
 	}
 
-	public void stop(BundleContext context) throws Exception {
+	@Override
+  public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		
 		super.stop(context);
@@ -41,5 +45,12 @@ public class PythonUIPlugin extends AbstractUIPlugin {
 	public static PythonUIPlugin getPlugin() {
 		return plugin;
 	}
-
+	
+	public static void logError(Throwable exception) {
+    if (getPlugin() != null) {
+      getPlugin().getLog().log(
+          new Status(IStatus.ERROR, PLUGIN_ID, exception.getMessage(), exception));
+    }
+  }
+	
 }
