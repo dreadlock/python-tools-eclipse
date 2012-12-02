@@ -36,8 +36,9 @@ public class PythonCorePlugin extends Plugin {
       initPython();
     }
     
+    // This is really not awesomely stable.
     ResourcesPlugin.getWorkspace().addResourceChangeListener(PythonBuilder.getBuilder(),
-        IResourceChangeEvent.PRE_BUILD);
+        IResourceChangeEvent.POST_CHANGE); // PRE_BUILD
   }
 
   private void initPython() {
