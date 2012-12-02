@@ -16,6 +16,7 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,9 +49,9 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
     List<String> commandsList = new ArrayList<String>();
 
     commandsList.add(pythonPath);
-    //commandsList.addAll(Arrays.asList(launchConfig.getVmArgumentsAsArray()));
+    commandsList.addAll(Arrays.asList(wrapper.getInterpreterArgumentsAsArray()));
     commandsList.add(scriptPath);
-    //commandsList.addAll(Arrays.asList(launchConfig.getArgumentsAsArray()));
+    commandsList.addAll(Arrays.asList(wrapper.getScriptArgumentsAsArray()));
 
     String[] commands = commandsList.toArray(new String[commandsList.size()]);
     ProcessBuilder processBuilder = new ProcessBuilder(commands);
@@ -117,13 +118,13 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
         new Status(IStatus.ERROR, PythonCorePlugin.PLUGIN_ID, t.toString(), t));
   }
 
-  private File getCurrentWorkingDirectory(PythonLaunchConfigWrapper launchConfig) {
-    if (launchConfig.getWorkingDirectory().length() > 0) {
-      String cwd = launchConfig.getWorkingDirectory();
+  private File getCurrentWorkingDirectory(PythonLaunchConfigWrapper wrapper) {
+    if (wrapper.getWorkingDirectory().length() > 0) {
+      String cwd = wrapper.getWorkingDirectory();
 
       return new File(cwd);
     } else {
-      IResource resource = launchConfig.getResource();
+      IResource resource = wrapper.getResource();
 
       return resource.getProject().getLocation().toFile();
     }
