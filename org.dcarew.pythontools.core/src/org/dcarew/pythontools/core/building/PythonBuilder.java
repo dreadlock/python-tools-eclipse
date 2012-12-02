@@ -93,7 +93,7 @@ public class PythonBuilder implements IResourceChangeListener {
 
           int exit = runner.execute();
 
-          System.out.println("pylint exit with code " + exit);
+          //System.out.println("pylint exit with code " + exit);
 
           if (exit > 0 && exit < 32) {
             processOutput(file, runner.getStdout());
@@ -105,18 +105,8 @@ public class PythonBuilder implements IResourceChangeListener {
     }
   }
 
-  /*
-   * build.py:757: [C] Line too long (85/80) build.py:1: [C] Too many lines in module (1063)
-   * build.py:225: [W] TODO(devoncarew): remove this hardcoded e:\ path build.py:690: [W]
-   * TODO(devoncarew): add DumpRenderTree.app as well? build.py:816: [W] TODO(pquitslund): migrate
-   * to a bucket copy (rather than serial uploads) build.py:1: [C] Missing docstring build.py:34:
-   * [C] Invalid name "utils" for type constant (should match (([A-Z_][A-Z0-9_]*)|(__.*__))$)
-   * build.py:55: [R, AntWrapper.RunAnt] Too many arguments (13/5) build.py:55: [R,
-   * AntWrapper.RunAnt] Too many local variables (21/15) build.py:55: [C, AntWrapper.RunAnt] Invalid
-   * name "RunAnt" for type method (should match [a-z_][a-z0-9_]{2,30}$) build.py:55: [R,
-   * AntWrapper.RunAnt] Too many branches (19/12) build.py:55: [R, AntWrapper.RunAnt] Too many
-   * statements (58/50) build.py:36: [R, AntWrapper] Too few public methods (1/2)
-   */
+  // build.py:757: [C] Line too long (85/80)
+  // build.py:1: [C] Too many lines in module (1063)
 
   private void processOutput(IFile file, String str) throws IOException {
     Pattern pattern = Pattern.compile("(\\S+):(\\d+): \\[(.*)\\] (.*)");
