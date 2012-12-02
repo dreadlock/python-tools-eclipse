@@ -71,4 +71,26 @@
       </shortcut>
    </extension>
 
+   <extension
+      point="org.eclipse.ui.themes">
+      <colorDefinition
+         id="org.dcarew.pythontools.ui.matchingBracketsColor"
+         isEditable="false"
+         label="%Dummy.label"
+         value="192,192,192">
+      </colorDefinition>
+      
+      <theme
+         id="org.eclipse.ui.ide.systemDefault">
+         <colorOverride
+            id="org.dcarew.pythontools.ui.matchingBracketsColor"
+            value="COLOR_WIDGET_NORMAL_SHADOW">
+         </colorOverride>
+      </theme>
+   </extension>
+
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.dcarew.pythontools.ui.preferences.PythonPreferenceInitializer"/>
+   </extension>
+
 </plugin>

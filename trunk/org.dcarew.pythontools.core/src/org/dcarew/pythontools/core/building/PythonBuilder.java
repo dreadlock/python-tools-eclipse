@@ -1,9 +1,7 @@
 package org.dcarew.pythontools.core.building;
 
 import org.dcarew.pythontools.core.PythonCorePlugin;
-import org.dcarew.pythontools.core.utils.ProcessRunner;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -11,15 +9,10 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.jobs.Job;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PythonBuilder implements IResourceChangeListener {
   private static PythonBuilder builder = new PythonBuilder();
@@ -61,10 +54,15 @@ public class PythonBuilder implements IResourceChangeListener {
             if (delta.getResource() instanceof IFile) {
               IFile file = (IFile) delta.getResource();
 
-              if (delta.getKind() == IResourceDelta.ADDED
-                  || delta.getKind() == IResourceDelta.CHANGED) {
+              if (delta.getKind() == IResourceDelta.ADDED) {
                 if (file.getName().endsWith(".py")) {
                   files.add(file);
+                }
+              } else if (delta.getKind() == IResourceDelta.CHANGED) {
+                if (file.getName().endsWith(".py")) {
+                  if (delta.getFlags() != IResourceDelta.MARKERS) {
+                    files.add(file);
+                  }
                 }
               }
             }
@@ -81,87 +79,13 @@ public class PythonBuilder implements IResourceChangeListener {
   }
 
   private void process(List<IFile> files) {
-    for (IFile file : files) {
-      MarkerUtils.clearMarkers(file);
-
-      String pylintPath = PythonCorePlugin.getPlugin().getPylintPath();
-
-      if (pylintPath != null) {
-        try {
-          ProcessRunner runner = new ProcessRunner(getCwd(file), pylintPath, "-f", "parseable",
-              "-r", "n", "-i", "y", "--indent-string=\"  \"", file.getName());
-
-          int exit = runner.execute();
-
-          //System.out.println("pylint exit with code " + exit);
-
-          if (exit > 0 && exit < 32) {
-            processOutput(file, runner.getStdout());
-          }
-        } catch (IOException e) {
-          PythonCorePlugin.logError(e);
-        }
-      }
-    }
-  }
-
-  // build.py:757: [C] Line too long (85/80)
-  // build.py:1: [C] Too many lines in module (1063)
-
-  private void processOutput(IFile file, String str) throws IOException {
-    Pattern pattern = Pattern.compile("(\\S+):(\\d+): \\[(.*)\\] (.*)");
-
-    BufferedReader r = new BufferedReader(new StringReader(str));
-
-    String line = r.readLine();
-
-    while (line != null) {
-      if (line.contains(": [")) {
-        Matcher matcher = pattern.matcher(line);
-
-        if (matcher.matches()) {
-          createMarker(file, matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4));
-        }
-      }
-
-      line = r.readLine();
-    }
-  }
-
-  // (C) convention, for programming standard violation
-  // (R) refactor, for bad code smell
-  // (W) warning, for python specific problems
-  // (E) error, for probable bugs in the code
-  // (F) fatal, if an error occurred which prevented pylint from doing further processing.
-
-  private void createMarker(IFile file, String fileName, String lineStr, String errorType,
-      String message) {
-    int line = 1;
-
-    try {
-      line = Integer.parseInt(lineStr);
-    } catch (NumberFormatException fne) {
-
+    if (files.size() == 0) {
+      return;
     }
 
-    String typeCode = errorType;
-
-    if (typeCode.indexOf(',') != -1) {
-      typeCode = typeCode.substring(0, typeCode.indexOf(','));
-    }
-
-    // TODO: use typecode to set the severity, and filter some stuff
-    int severity = IMarker.SEVERITY_WARNING;
-
-    if (typeCode.startsWith("E") || typeCode.startsWith("F")) {
-      severity = IMarker.SEVERITY_ERROR;
-    }
-
-    MarkerUtils.createMarker(severity, file, line, typeCode + ": " + message);
-  }
-
-  private File getCwd(IFile file) {
-    return file.getParent().getLocation().toFile();
+    // Analyze in a job.
+    Job job = new PylintJob(files.get(0).getProject(), files);
+    job.schedule();
   }
 
 }

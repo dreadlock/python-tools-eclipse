@@ -2,9 +2,12 @@ package org.dcarew.pythontools.ui;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.texteditor.ChainedPreferenceStore;
 import org.osgi.framework.BundleContext;
 
 import java.util.HashMap;
@@ -22,6 +25,8 @@ public class PythonUIPlugin extends AbstractUIPlugin {
   private static PythonUIPlugin plugin;
 
   private static Map<ImageDescriptor, Image> imageCache = new HashMap<ImageDescriptor, Image>();
+
+  private IPreferenceStore combinedPreferenceStore;
 
   /**
    * The constructor
@@ -42,6 +47,23 @@ public class PythonUIPlugin extends AbstractUIPlugin {
     plugin = null;
 
     super.stop(context);
+  }
+
+  /**
+   * Returns a combined preference store, this store is read-only.
+   * 
+   * @return the combined preference store
+   * @since 3.1
+   */
+  public IPreferenceStore getCombinedPreferenceStore() {
+    if (combinedPreferenceStore == null) {
+      IPreferenceStore generalTextStore = EditorsUI.getPreferenceStore();
+      
+      combinedPreferenceStore = new ChainedPreferenceStore(new IPreferenceStore[] {
+          getPreferenceStore(), generalTextStore});
+    }
+
+    return combinedPreferenceStore;
   }
 
   /**

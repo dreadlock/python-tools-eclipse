@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The tokenizer (ITokenScanner) for python content.
+ * The tokenizer (ITokenScanner) for Python content.
  */
 class PythonScanner extends RuleBasedScanner {
 
@@ -36,7 +36,7 @@ class PythonScanner extends RuleBasedScanner {
     Token keywordToken = new Token(new TextAttribute(Display.getDefault().getSystemColor(
         SWT.COLOR_BLACK), null, SWT.BOLD));
     Token commentToken = new Token(new TextAttribute(Display.getDefault().getSystemColor(
-        SWT.COLOR_GRAY)));
+        SWT.COLOR_DARK_GREEN)));
     Token stringToken = new Token(new TextAttribute(Display.getDefault().getSystemColor(
         SWT.COLOR_BLUE)));
 
@@ -48,18 +48,19 @@ class PythonScanner extends RuleBasedScanner {
       keywordRule.addWord(keyword, keywordToken);
     }
     
+    keywordRule.addWord("None", keywordToken);
+    
     rules.add(keywordRule);
 
     // comments
     rules.add(new EndOfLineRule("#", commentToken));
 
+    // TODO: raw strings
     // strings
-    // TODO: continuations
-    // TODO: raw string
+    rules.add(new MultiLineRule("\"\"\"", "\"\"\"", stringToken));
+    rules.add(new MultiLineRule("'''", "'''", stringToken));
     rules.add(new SingleLineRule("'", "'", stringToken, '\\', true));
     rules.add(new SingleLineRule("\"", "\"", stringToken, '\\', true));
-    rules.add(new MultiLineRule("'''", "'''", stringToken));
-    rules.add(new MultiLineRule("\"\"\"", "\"\"\"", stringToken));
 
     setRules(rules.toArray(new IRule[rules.size()]));
   }
