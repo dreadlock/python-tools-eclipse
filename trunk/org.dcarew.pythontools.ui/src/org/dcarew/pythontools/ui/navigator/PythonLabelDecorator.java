@@ -2,7 +2,6 @@ package org.dcarew.pythontools.ui.navigator;
 
 import org.dcarew.pythontools.core.PythonCorePlugin;
 import org.dcarew.pythontools.ui.PythonUIPlugin;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -48,15 +47,14 @@ public class PythonLabelDecorator implements ILightweightLabelDecorator {
           decoration.addOverlay(overlayImageDescriptor, IDecoration.BOTTOM_LEFT);
         }
       }
-    } else if (element instanceof IContainer) {
-      IContainer folder = (IContainer) element;
-
-      ImageDescriptor overlayImageDescriptor = getDecorationForResource(folder);
-
-      if (overlayImageDescriptor != null) {
-        decoration.addOverlay(overlayImageDescriptor, IDecoration.BOTTOM_LEFT);
-      }
-    }
+    } /*
+       * else if (element instanceof IContainer) { IContainer folder = (IContainer) element;
+       * 
+       * ImageDescriptor overlayImageDescriptor = getDecorationForResource(folder);
+       * 
+       * if (overlayImageDescriptor != null) { decoration.addOverlay(overlayImageDescriptor,
+       * IDecoration.BOTTOM_LEFT); } }
+       */
   }
 
   @Override
@@ -74,7 +72,7 @@ public class PythonLabelDecorator implements ILightweightLabelDecorator {
 
   private ImageDescriptor getDecorationForResource(IResource resource) {
     try {
-      int severity = resource.findMaxProblemSeverity(IMarker.PROBLEM, true,
+      int severity = resource.findMaxProblemSeverity(PythonCorePlugin.MARKER_ID, true,
           IResource.DEPTH_INFINITE);
 
       if (severity == IMarker.SEVERITY_ERROR) {
