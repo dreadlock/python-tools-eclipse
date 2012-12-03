@@ -1,8 +1,11 @@
 package org.dcarew.pythontools.ui.editors;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;
+import org.eclipse.jface.text.contentassist.ContentAssistant;
+import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -16,7 +19,7 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
   private PythonEditor editor;
   private MonoReconciler reconciler;
   private PythonScanner scanner;
-  
+
   public PythonEditorSourceViewerConfiguration(PythonEditor editor, IPreferenceStore preferenceStore) {
     super(preferenceStore);
 
@@ -32,6 +35,32 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
 
     return reconciler;
   }
+
+  @Override
+  public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
+    if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
+      return new IAutoEditStrategy[] {new PythonAutoIndentStrategy()};
+    } else {
+      return super.getAutoEditStrategies(sourceViewer, contentType);
+    }
+  }
+
+  @Override
+  public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
+    ContentAssistant assistant = new ContentAssistant();
+    
+    // TODO: no code completions in strings
+    assistant.setContentAssistProcessor(new PythonContentAssistProcessor(),
+        IDocument.DEFAULT_CONTENT_TYPE);
+
+    return assistant;
+  }
+
+  // TODO:
+//  @Override
+//  public String[] getIndentPrefixes(ISourceViewer sourceViewer, String contentType) {
+//    return new String[] {"  ", ""};
+//  }
 
   @Override
   public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
@@ -58,7 +87,7 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
       scanner = new PythonScanner();
       scanner.setDefaultReturnToken(new Token(new TextAttribute(null)));
     }
-    
+
     return scanner;
   }
 

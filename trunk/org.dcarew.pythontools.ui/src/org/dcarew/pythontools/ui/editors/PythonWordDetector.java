@@ -23,13 +23,21 @@ class PythonWordDetector implements IWordDetector {
   }
 
   @Override
-  public boolean isWordPart(final char c) {
-    return c == '_' || Character.isJavaIdentifierPart(c);
+  public boolean isWordPart(char c) {
+    return wordPart(c);
   }
 
   @Override
-  public boolean isWordStart(final char c) {
-    return c == '_' || Character.isJavaIdentifierStart(c);
+  public boolean isWordStart(char c) {
+    return wordStart(c);
   }
 
+  public final static boolean wordPart(char c) {
+    return c == '_' || Character.isJavaIdentifierPart(c);
+  }
+
+  public final static boolean wordStart(char c) {
+    return c == '_' || Character.isJavaIdentifierStart(c);
+  }
+  
 }
