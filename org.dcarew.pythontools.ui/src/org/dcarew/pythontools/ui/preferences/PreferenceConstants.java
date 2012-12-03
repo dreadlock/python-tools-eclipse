@@ -23,6 +23,22 @@ public class PreferenceConstants {
    */
   public final static String EDITOR_MATCHING_BRACKETS_COLOR = "matchingBracketsColor";
 
+  /**
+   * A named preference that controls whether the print margin is turned on or off (value
+   * <code>"printMargin"</code>).
+   * <p>
+   * The preference value is of type <code>Boolean</code>.
+   */
+  public final static String EDITOR_PRINT_MARGIN = "printMargin";
+
+  /**
+   * Print margin column (value <code>"printMarginColumn"</code>).
+   * <p>
+   * The preference value is of type <code>int</code>.
+   * </p>
+   */
+  public final static String EDITOR_PRINT_MARGIN_COLUMN = "printMarginColumn";
+
   private PreferenceConstants() {
 
   }
@@ -34,6 +50,10 @@ public class PreferenceConstants {
   public static void initializeDefaultValues(IPreferenceStore store) {
     store.setDefault(PreferenceConstants.EDITOR_MATCHING_BRACKETS, true);
     store.setDefault(PreferenceConstants.EDITOR_MATCHING_BRACKETS_COLOR, "192,192,192");
+
+    // We'd like it to default to on, but give the user the ability to turn it off.
+    //store.setDefault(PreferenceConstants.EDITOR_PRINT_MARGIN, true);
+    store.setDefault(PreferenceConstants.EDITOR_PRINT_MARGIN_COLUMN, 80);
 
     // See JavaUIPreferenceInitializer.setThemeBasedPreferences().
 
