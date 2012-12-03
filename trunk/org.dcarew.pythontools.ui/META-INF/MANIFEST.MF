@@ -3,7 +3,7 @@ Bundle-Localization: plugin
 Bundle-ManifestVersion: 2
 Bundle-Name: Python Tools UI Plugin
 Bundle-SymbolicName: org.dcarew.pythontools.ui;singleton:=true
-Bundle-Version: 0.2.2.qualifier
+Bundle-Version: 0.2.3.qualifier
 Bundle-Activator: org.dcarew.pythontools.ui.PythonUIPlugin
 Bundle-Vendor: Python Tools for Eclipse
 Require-Bundle: org.eclipse.ui,

@@ -127,14 +127,13 @@ class PylintJob extends WorkspaceJob {
       typeCode = typeCode.substring(0, typeCode.indexOf(','));
     }
 
-    // TODO: use typecode to set the severity, and filter some stuff
     int severity = IMarker.SEVERITY_WARNING;
 
     if (typeCode.startsWith("E") || typeCode.startsWith("F")) {
       severity = IMarker.SEVERITY_ERROR;
     }
 
-    MarkerUtils.createMarker(severity, file, line, typeCode + ": " + message);
+    MarkerUtils.createMarker(severity, file, line, typeCode + ": " + message, typeCode);
   }
 
   private File getCwd(IFile file) {

@@ -2,6 +2,7 @@ package org.dcarew.pythontools.core;
 
 import org.dcarew.pythontools.core.building.PythonBuilder;
 import org.dcarew.pythontools.core.utils.PythonLocator;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
@@ -83,6 +84,10 @@ public class PythonCorePlugin extends Plugin {
     }
   }
 
+  public static boolean isPythonFile(IFile file) {
+    return "py".equals(file.getFileExtension());
+  }
+  
   public IEclipsePreferences getPreferences() {
     if (prefs == null) {
       prefs = InstanceScope.INSTANCE.getNode(PLUGIN_ID);
