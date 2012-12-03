@@ -99,7 +99,7 @@
          id="org.dcarew.pythontools.ui.navigator.lightweightDecorator"
          label="Python"
          lightweight="true"
-         location="TOP_LEFT"
+         location="BOTTOM_LEFT"
          state="true">
          
          <enablement>
