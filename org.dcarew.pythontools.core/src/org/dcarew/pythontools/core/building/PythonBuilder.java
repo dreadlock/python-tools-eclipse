@@ -38,7 +38,7 @@ public class PythonBuilder implements IResourceChangeListener {
               if (resource instanceof IFile) {
                 IFile file = (IFile) resource;
 
-                if (file.getName().endsWith(".py")) {
+                if (PythonCorePlugin.isPythonFile(file)) {
                   files.add(file);
                 }
               }
@@ -55,11 +55,11 @@ public class PythonBuilder implements IResourceChangeListener {
               IFile file = (IFile) delta.getResource();
 
               if (delta.getKind() == IResourceDelta.ADDED) {
-                if (file.getName().endsWith(".py")) {
+                if (PythonCorePlugin.isPythonFile(file)) {
                   files.add(file);
                 }
               } else if (delta.getKind() == IResourceDelta.CHANGED) {
-                if (file.getName().endsWith(".py")) {
+                if (PythonCorePlugin.isPythonFile(file)) {
                   if (delta.getFlags() != IResourceDelta.MARKERS) {
                     files.add(file);
                   }

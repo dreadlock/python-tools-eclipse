@@ -53,7 +53,7 @@ public class PythonLaunchShortcut implements ILaunchShortcut2 {
       return null;
     }
 
-    if (resource instanceof IFile && resource.getName().endsWith(".py")) {
+    if (resource instanceof IFile && PythonCorePlugin.isPythonFile((IFile) resource)) {
       List<ILaunchConfiguration> results = new ArrayList<ILaunchConfiguration>();
 
       try {
@@ -166,7 +166,7 @@ public class PythonLaunchShortcut implements ILaunchShortcut2 {
 
   private boolean testSimilar(IResource resource, ILaunchConfiguration config) {
     PythonLaunchConfigWrapper wrapper = new PythonLaunchConfigWrapper(config);
-    
+
     return resource.equals(wrapper.getResource());
   }
 

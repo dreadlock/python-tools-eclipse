@@ -93,4 +93,21 @@
       <initializer class="org.dcarew.pythontools.ui.preferences.PythonPreferenceInitializer"/>
    </extension>
 
+   <extension point="org.eclipse.ui.decorators">
+      <decorator
+         class="org.dcarew.pythontools.ui.navigator.PythonLabelDecorator"
+         id="org.dcarew.pythontools.ui.navigator.lightweightDecorator"
+         label="Python"
+         lightweight="true"
+         location="TOP_LEFT"
+         state="true">
+         
+         <enablement>
+            <objectClass
+               name="org.eclipse.core.resources.IResource">
+            </objectClass>
+         </enablement>
+      </decorator>
+   </extension>
+
 </plugin>
