@@ -1,6 +1,7 @@
 package org.dcarew.pythontools.core.launching;
 
 import org.dcarew.pythontools.core.PythonCorePlugin;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -107,6 +108,26 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
 //    }
 
     monitor.done();
+  }
+
+  @Override
+  public boolean buildForLaunch(ILaunchConfiguration configuration, String mode,
+      IProgressMonitor monitor) {
+    return false;
+  }
+
+  @Override
+  protected IProject[] getBuildOrder(ILaunchConfiguration configuration, String mode)
+      throws CoreException {
+    PythonLaunchConfigWrapper launchConfig = new PythonLaunchConfigWrapper(configuration);
+
+    IResource resource = launchConfig.getResource();
+
+    if (resource != null) {
+      return new IProject[] {resource.getProject()};
+    }
+
+    return null;
   }
 
   private DebugException newDebugException(String message) {
