@@ -49,6 +49,8 @@ class PythonScanner extends RuleBasedScanner {
     }
     
     keywordRule.addWord("None", keywordToken);
+    keywordRule.addWord("True", keywordToken);
+    keywordRule.addWord("False", keywordToken);
     
     rules.add(keywordRule);
 
