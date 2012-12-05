@@ -3,6 +3,23 @@
 <plugin>
    
    <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/python-nature.png"
+            id="org.dcarew.pythontools.core.pythonNatureImage"
+            natureId="org.dcarew.pythontools.core.pythonNature">
+      </image>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.intro.configExtension">
+      <configExtension
+            configId="org.eclipse.ui.intro.universalConfig"
+            content="welcome/intro.xml">
+      </configExtension>
+   </extension>
+   
+   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             class="org.dcarew.pythontools.ui.preferences.PythonPreferencePage"
