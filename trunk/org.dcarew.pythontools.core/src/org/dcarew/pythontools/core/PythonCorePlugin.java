@@ -1,6 +1,6 @@
 package org.dcarew.pythontools.core;
 
-import org.dcarew.pythontools.core.building.PythonBuilder;
+import org.dcarew.pythontools.core.builder.PythonResourceChangeBuilder;
 import org.dcarew.pythontools.core.utils.PythonLocator;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -38,7 +38,7 @@ public class PythonCorePlugin extends Plugin {
     }
     
     // This is really not awesomely stable.
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(PythonBuilder.getBuilder(),
+    ResourcesPlugin.getWorkspace().addResourceChangeListener(PythonResourceChangeBuilder.getBuilder(),
         IResourceChangeEvent.POST_CHANGE); // PRE_BUILD
   }
 
@@ -61,7 +61,7 @@ public class PythonCorePlugin extends Plugin {
 
   @Override
   public void stop(BundleContext context) throws Exception {
-    ResourcesPlugin.getWorkspace().removeResourceChangeListener(PythonBuilder.getBuilder());
+    ResourcesPlugin.getWorkspace().removeResourceChangeListener(PythonResourceChangeBuilder.getBuilder());
 
     plugin = null;
 
