@@ -2,6 +2,25 @@
 <?eclipse version="3.4"?>
 <plugin>
 
+   <extension
+      point="org.eclipse.core.resources.natures"
+      id="pythonNature"
+      name="%dart.nature.name">
+      <runtime>
+         <run class="org.dcarew.pythontools.core.builder.PythonNature"/>
+      </runtime>
+   </extension>
+
+   <extension
+      point="org.eclipse.core.resources.builders"
+      id="pythonBuilder"
+      name="%dart.builder.name">
+      
+      <builder>
+         <run class="org.dcarew.pythontools.core.builder.PythonBuilder"/>
+      </builder>
+   </extension>
+  
    <extension point="org.eclipse.core.contenttype.contentTypes">
       <content-type
             id="org.dcarew.pythontools.pyFile"
