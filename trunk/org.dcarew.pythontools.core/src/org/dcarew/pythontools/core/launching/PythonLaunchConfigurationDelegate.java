@@ -130,6 +130,18 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
     return null;
   }
 
+  @Override
+  protected IProject[] getProjectsForProblemSearch(ILaunchConfiguration configuration, String mode)
+      throws CoreException {
+    return getBuildOrder(configuration, mode);
+  }
+
+  @Override
+  public boolean preLaunchCheck(ILaunchConfiguration configuration, String mode,
+      IProgressMonitor monitor) throws CoreException {
+    return saveBeforeLaunch(configuration, mode, monitor);
+  }
+
   private DebugException newDebugException(String message) {
     return new DebugException(new Status(IStatus.ERROR, PythonCorePlugin.PLUGIN_ID, message));
   }
@@ -147,7 +159,7 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
     } else {
       IResource resource = wrapper.getResource();
 
-      return resource.getProject().getLocation().toFile();
+      return resource.getParent().getLocation().toFile();
     }
   }
 

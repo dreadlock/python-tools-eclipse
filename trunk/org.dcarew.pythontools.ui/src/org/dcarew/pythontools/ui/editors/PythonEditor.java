@@ -27,10 +27,10 @@ public class PythonEditor extends TextEditor {
 
     setSourceViewerConfiguration(new PythonEditorSourceViewerConfiguration(this,
         getPreferenceStore()));
-    
+
     // TODO:
     setRulerContextMenuId("#PythonEditorRulerContext");
-    
+
     setDocumentProvider(new PythonDocumentProvider());
 
     // TODO: key binding scopes
@@ -102,10 +102,21 @@ public class PythonEditor extends TextEditor {
     super.setTitleImage(image);
   }
 
+  protected String getText() {
+    return getSourceViewer().getDocument().get();
+  }
+
   protected void handleReconcilation(IRegion partition) {
     if (outlinePage != null) {
       outlinePage.handleEditorReconcilation();
     }
+
+    // TODO:
+//    PythonParser parser = new PythonParser(getText());
+//
+//    PyModule module = parser.parse();
+//
+//    System.out.println(module);
   }
 
   ISourceViewer getISourceViewer() {

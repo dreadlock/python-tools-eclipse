@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 public class ProcessRunner {
   private ProcessBuilder builder;
@@ -20,6 +21,10 @@ public class ProcessRunner {
   }
 
   public int execute() throws IOException {
+    return execute(null);
+  }
+  
+  public int execute(String stdinInput) throws IOException {
     stdout.setLength(0);
 
     final Process process = builder.start();
@@ -34,6 +39,12 @@ public class ProcessRunner {
 
     stdoutThread.start();
 
+    if (stdinInput != null) {
+      byte[] data = stdinInput.getBytes(Charset.forName("UTF-8"));
+      process.getOutputStream().write(data);
+      process.getOutputStream().close();
+    }
+    
     try {
       return process.waitFor();
     } catch (InterruptedException e) {
@@ -64,5 +75,4 @@ public class ProcessRunner {
 
     }
   }
-
 }

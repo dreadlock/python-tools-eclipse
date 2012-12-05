@@ -22,10 +22,10 @@ class BracketInserter implements VerifyKeyListener {
   @Override
   public void verifyKey(VerifyEvent event) {
     // TODO: this code needs cleanup before we turn it on
-    if (false) {
+    if (true) {
       return;
     }
-      
+
     // early pruning to slow down normal typing as little as possible
     if (!event.doit || editor.isBlockSelectionModeEnabled() && isMultilineSelection()) {
       return;
@@ -66,7 +66,7 @@ class BracketInserter implements VerifyKeyListener {
       if (nextChar == closingCharacter) {
         return;
       }
-      
+
       // TODO: make sure we're not in a comment
 //      ITypedRegion partition = TextUtilities.getPartition(document,
 //          IJavaPartitions.JAVA_PARTITIONING, offset, true);
@@ -84,7 +84,7 @@ class BracketInserter implements VerifyKeyListener {
 
       document.replace(offset, length, buffer.toString());
       sourceViewer.setSelectedRange(offset + 1, 0);
-      
+
 //      BracketLevel level = new BracketLevel();
 //      fBracketLevelStack.push(level);
 //

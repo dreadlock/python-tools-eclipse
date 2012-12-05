@@ -11,6 +11,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -27,24 +28,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
- * Traceback (most recent call last): File "scripts/pyparse.py", line 51, in <module>
- * sys.exit(main(sys.argv[0])) File "scripts/pyparse.py", line 47, in main myFoofoo.visit(astNode)
- * File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/ast.py", line 241,
- * in visit return visitor(node) File "scripts/pyparse.py", line 17, in visit_Module
- * ast.NodeVisitor.generic_visit(self, node) File
- * "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/ast.py", line 249, in
- * generic_visit self.visit(item) File
- * "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/ast.py", line 241, in
- * visit return visitor(node) File "scripts/pyparse.py", line 32, in visit_ClassDef
- * ast.NodeVisitor.generic_visit(self, node) File
- * "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/ast.py", line 249, in
- * generic_visit self.visit(item) File
- * "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/ast.py", line 241, in
- * visit return visitor(node) File "scripts/pyparse.py", line 29, in visit_Attribute print
- * '{attribute=%s' % node.name AttributeError: 'Attribute' object has no attribute 'name'
- */
-
 public class PythonConsolePatternMatcher implements IPatternMatchListenerDelegate {
   private TextConsole console;
 
@@ -59,7 +42,7 @@ public class PythonConsolePatternMatcher implements IPatternMatchListenerDelegat
   }
 
   // "foo2.py", line 33
-  private static Pattern pattern = Pattern.compile("(.*\")(.*\\.py)(\", line )(\\d+)(,.*)");
+  private static Pattern pattern = Pattern.compile("(.*\")(.*\\.py)(\", line )(\\d+)(.*)");
 
   @Override
   public void matchFound(PatternMatchEvent event) {
@@ -80,8 +63,8 @@ public class PythonConsolePatternMatcher implements IPatternMatchListenerDelegat
 
         }
 
-        int matchOffset = event.getOffset() + matcher.group(1).length();
-        int matchLength = path.length();
+        int matchOffset = event.getOffset() + matcher.group(1).length() - 1;
+        int matchLength = path.length() + matcher.group(3).length() + lineStr.length() + 1;
 
         IFile file = locateFile(path);
 
@@ -182,8 +165,8 @@ public class PythonConsolePatternMatcher implements IPatternMatchListenerDelegat
     try {
       IDocumentProvider provider = editor.getDocumentProvider();
       IDocument document = provider.getDocument(editor.getEditorInput());
-      int offset = document.getLineOffset(line - 1);
-      editor.selectAndReveal(offset, 0);
+      IRegion lineInfo = document.getLineInformation(line - 1);
+      editor.selectAndReveal(lineInfo.getOffset(), lineInfo.getLength());
       if (page.getActiveEditor() != editor) {
         page.activate(editor);
       }
