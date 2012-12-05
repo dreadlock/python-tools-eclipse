@@ -5,47 +5,89 @@ import ast
 
 myVar = 0
 
-#<_ast.Import object at 0x108e94990>
-#<_ast.Assign object at 0x108e94a90>
+class MyClass:
+  def __init__(self):
+    print self
+  def FunctionA(self, one):
+    print self + one
+  def FunctionB(self, two):
+    print self + two
+    
 
-class foofoo(ast.NodeVisitor):
-  def generic_visit(self, node):
-    print node
-    #ast.NodeVisitor.generic_visit(self, node)
-  def visit_Module(self, node):
-    print '{'
-    ast.NodeVisitor.generic_visit(self, node)
-    print '}'
-  def visit_Assign(self, _):
-    print '{assign}'
-  def visit_If(self, _):
-    print '{if}'
-  def visit_Import(self, _):
-    print '{import}'
-  def visit_FunctionDef(self, node):
-    print '{function=' + node.name + '}'
-    #ast.NodeVisitor.generic_visit(self, node)
-  def visit_Attribute(self, node):
-    print '{attribute=%s' % node.name
-  def visit_ClassDef(self, node):
-    print '{class=' + node.name + ','
-    ast.NodeVisitor.generic_visit(self, node)
-    print '}'
+# TODO: clean up the printing
 
-#FunctionDef
+def printModule(name, module):
+  indent = '  '
+  
+  print '{"module": ['
+  
+  for child in module.body:
+    if isinstance(child, ast.ClassDef):
+      printClassDef(child, indent)
+      print ','
+    elif isinstance(child, ast.FunctionDef):
+      printFunctionDef(child, indent)
+      print ','
+    elif isinstance(child, ast.Import):
+      printImport(child, indent)
+      print ','
+    #else:
+    #  print '%s%s' % (indent, type(child))
+      
+  print ']}'
 
-def main(filename):
-  filecontents = file(filename).read()
+
+def printClassDef(node, indent):
+  # identifier name, expr* bases, stmt* body, expr* decorator_list
+  print '%s{"class":{"name":"%s","location":%s,"children":[' % (
+      indent, node.name, location(node))
   
-  #print filename
+  for child in node.body:
+    if isinstance(child, ast.FunctionDef):
+      printFunctionDef(child, indent + '  ')
+      print ','
+    
+  print '%s]}}' % indent
+
+
+def printFunctionDef(node, indent):
+  # identifier name, arguments args, stmt* body, expr* decorator_list
+  print '%s{"function":{"name":"%s","location":%s}}' % (
+    indent, node.name, location(node))
+
+
+def printImport(node, indent):
+  # alias* names
+  # alias = (identifier name, identifier? asname)
+  # TODO:
+  print '%s{"import":"foo"}' % (indent)
+
+
+def location(identifier):
+  return '{"lineno":%i,"col_offset":%i}' % (
+    identifier.lineno, identifier.col_offset)
   
-  #astNode = ast.parse("print 'hello!'\nprint 'foo'") #, '<string>', 'exec')
-  astNode = ast.parse(filecontents, filename) #, '<string>', 'exec')
-  #print ast.dump(astNode, include_attributes=True)
   
-  myFoofoo = foofoo()
-  myFoofoo.visit(astNode)
+def process(filename):
+  contents = file(filename).read()
+  module = ast.parse(contents, filename) #, '<string>', 'exec')  
+  printModule(filename, module)
+  
+  
+def processStdin():  
+  contents = sys.stdin.read()
+  module = ast.parse(contents, 'stdin') #, '<string>', 'exec')
+  printModule('stdin', module)
+  
   
 if __name__ == '__main__':
-  #TODO: change to using argv[1]
-  sys.exit(main(sys.argv[0]))
+  # if sys args are given, read from and process each file
+  # else read from stdin
+  fileList = sys.argv[1:]
+  if fileList:
+    for f in fileList:
+      process(f)
+  else:
+    processStdin()
+    
+  sys.exit(0)
