@@ -13,14 +13,24 @@ class foofoo(ast.NodeVisitor):
     print node
     #ast.NodeVisitor.generic_visit(self, node)
   def visit_Module(self, node):
-    print '{module}'
+    print '{'
     ast.NodeVisitor.generic_visit(self, node)
+    print '}'
+  def visit_Assign(self, _):
+    print '{assign}'
+  def visit_If(self, _):
+    print '{if}'
+  def visit_Import(self, _):
+    print '{import}'
   def visit_FunctionDef(self, node):
     print '{function=' + node.name + '}'
     #ast.NodeVisitor.generic_visit(self, node)
+  def visit_Attribute(self, node):
+    print '{attribute=%s' % node.name
   def visit_ClassDef(self, node):
-    print '{class=' + node.name + '}'
+    print '{class=' + node.name + ','
     ast.NodeVisitor.generic_visit(self, node)
+    print '}'
 
 #FunctionDef
 

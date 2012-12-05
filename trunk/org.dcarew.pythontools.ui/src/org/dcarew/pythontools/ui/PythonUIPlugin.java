@@ -21,6 +21,8 @@ public class PythonUIPlugin extends AbstractUIPlugin {
   // The plug-in ID
   public static final String PLUGIN_ID = "org.dcarew.pythontools.ui"; //$NON-NLS-1$
 
+  public static final String EDITOR_ID = "org.dcarew.pythontools.ui.editors.python";
+  
   // The shared instance
   private static PythonUIPlugin plugin;
 

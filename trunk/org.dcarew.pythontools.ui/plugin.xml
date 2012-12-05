@@ -110,4 +110,19 @@
       </decorator>
    </extension>
 
+   <!--   File "scripts/pyparse.py", line 51, in <module> -->
+   <extension
+         point="org.eclipse.ui.console.consolePatternMatchListeners">
+      <consolePatternMatchListener
+            class="org.dcarew.pythontools.ui.console.PythonConsolePatternMatcher"
+            id="org.dcarew.pythontools.ui.console.consolePatternMatcher"
+            regex='  File "(.*)\.py", line (\d+),.*'
+            qualifier='  File "'>
+         <enablement>
+            <test property="org.eclipse.ui.console.consoleTypeTest"
+               value="org.eclipse.debug.ui.ProcessConsoleType"/>
+         </enablement>
+      </consolePatternMatchListener>
+   </extension>
+
 </plugin>
