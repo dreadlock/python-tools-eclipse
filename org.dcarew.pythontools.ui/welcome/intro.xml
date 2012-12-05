@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<introContent>
+   <extensionContent id="python-introExtension" style="intro.css" name="Python Development" path="overview/@">
+      <group style-id="content-group" id="python-introLink-group">
+         <link
+            label="Python Development"
+            url="http://org.eclipse.ui.intro/runAction?class=org.dcarew.pythontools.ui.welcome.OpenNewProjectWizardAction&amp;amp;pluginId=org.dcarew.pythontools.ui"
+            id="python-introLink" style-id="content-link">
+               <text>Get started by creating a new Python project</text>
+         </link>
+      </group>
+   </extensionContent>
+</introContent>
