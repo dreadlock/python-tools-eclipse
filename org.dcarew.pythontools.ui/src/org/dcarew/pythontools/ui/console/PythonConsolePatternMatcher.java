@@ -42,7 +42,7 @@ public class PythonConsolePatternMatcher implements IPatternMatchListenerDelegat
   }
 
   // "foo2.py", line 33
-  private static Pattern pattern = Pattern.compile("(.*\")(.*\\.py)(\", line )(\\d+)(.*)");
+  private static Pattern pattern = Pattern.compile("(.*\")(.*\\.py)(\", line )(\\d+)(,.*)");
 
   @Override
   public void matchFound(PatternMatchEvent event) {

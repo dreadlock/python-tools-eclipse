@@ -24,13 +24,10 @@ def printModule(name, module):
   for child in module.body:
     if isinstance(child, ast.ClassDef):
       printClassDef(child, indent)
-      print ','
     elif isinstance(child, ast.FunctionDef):
       printFunctionDef(child, indent)
-      print ','
     elif isinstance(child, ast.Import):
       printImport(child, indent)
-      print ','
     #else:
     #  print '%s%s' % (indent, type(child))
       
@@ -45,14 +42,13 @@ def printClassDef(node, indent):
   for child in node.body:
     if isinstance(child, ast.FunctionDef):
       printFunctionDef(child, indent + '  ')
-      print ','
     
-  print '%s]}}' % indent
+  print '%s]}},' % indent
 
 
 def printFunctionDef(node, indent):
   # identifier name, arguments args, stmt* body, expr* decorator_list
-  print '%s{"function":{"name":"%s","location":%s}}' % (
+  print '%s{"function":{"name":"%s","location":%s}},' % (
     indent, node.name, location(node))
 
 
@@ -60,7 +56,7 @@ def printImport(node, indent):
   # alias* names
   # alias = (identifier name, identifier? asname)
   # TODO:
-  print '%s{"import":"foo"}' % (indent)
+  print '%s{"import":"foo"},' % (indent)
 
 
 def location(identifier):
