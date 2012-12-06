@@ -6,10 +6,26 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class PythonNature implements IProjectNature {
   public static final String NATURE_ID = "org.dcarew.pythontools.core.pythonNature";
-  
+
   private IProject project;
+
+  public static void addToProject(IProject project) throws CoreException {
+    IProjectDescription description = project.getDescription();
+
+    Set<String> natures = new HashSet<String>(Arrays.asList(description.getNatureIds()));
+
+    natures.add(NATURE_ID);
+
+    description.setNatureIds(natures.toArray(new String[natures.size()]));
+
+    project.setDescription(description, null);
+  }
 
   public PythonNature() {
 

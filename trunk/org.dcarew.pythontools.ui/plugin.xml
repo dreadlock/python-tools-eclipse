@@ -133,13 +133,46 @@
       <consolePatternMatchListener
             class="org.dcarew.pythontools.ui.console.PythonConsolePatternMatcher"
             id="org.dcarew.pythontools.ui.console.consolePatternMatcher"
-            regex='  File "(.*)\.py", line (\d+).*'
+            regex='  File "(.*)\.py", line (\d+),.*'
             qualifier='  File "'>
          <enablement>
             <test property="org.eclipse.ui.console.consoleTypeTest"
                value="org.eclipse.debug.ui.ProcessConsoleType"/>
          </enablement>
       </consolePatternMatchListener>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.dcarew.pythontools.ui.wizards.projects"
+            name="Python">
+      </category>
+      
+      <!-- TODO: use finalPerspective? -->
+      <!-- TODO: update the icon -->
+      <wizard
+            category="org.dcarew.pythontools.ui.wizards.projects"
+            class="org.dcarew.pythontools.ui.wizards.NewPythonProjectWizard"
+            icon="icons/python_16.png"
+            id="org.dcarew.pythontools.ui.wizards.newProject"
+            name="Python Project"
+            project="true">
+            <description>
+               Create a new Python project
+            </description>
+      </wizard>
+      
+      <wizard
+            category="org.dcarew.pythontools.ui.wizards.projects"
+            class="org.dcarew.pythontools.ui.wizards.NewPythonFileWizard"
+            icon="icons/python_16.png"
+            id="org.dcarew.pythontools.ui.wizards.newFile"
+            name="Python File">
+            <description>
+               Create a new Python file
+            </description>
+      </wizard>      
    </extension>
 
 </plugin>

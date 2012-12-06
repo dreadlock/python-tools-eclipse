@@ -1,7 +1,9 @@
 package org.dcarew.pythontools.ui.welcome;
 
+import org.dcarew.pythontools.ui.wizards.NewPythonProjectWizard;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.intro.IIntroPart;
 
@@ -18,10 +20,11 @@ public class OpenNewProjectWizardAction extends Action {
   public void run() {
     closeIntroPage();
 
-    // TODO:
-
-    MessageDialog.openInformation(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-        "TODO:", "create a new Python project");
+    NewPythonProjectWizard wizard = new NewPythonProjectWizard();
+    wizard.init(PlatformUI.getWorkbench(), new StructuredSelection());
+    WizardDialog dialog = new WizardDialog(
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
+    dialog.open();
   }
 
   private void closeIntroPage() {
