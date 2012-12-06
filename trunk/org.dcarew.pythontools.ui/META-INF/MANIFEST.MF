@@ -3,7 +3,7 @@ Bundle-Localization: plugin
 Bundle-ManifestVersion: 2
 Bundle-Name: Python Tools UI Plugin
 Bundle-SymbolicName: org.dcarew.pythontools.ui;singleton:=true
-Bundle-Version: 0.3.2.qualifier
+Bundle-Version: 0.3.3.qualifier
 Bundle-Activator: org.dcarew.pythontools.ui.PythonUIPlugin
 Bundle-Vendor: Python Tools for Eclipse
 Require-Bundle: org.eclipse.ui,
@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.debug.ui,
  org.eclipse.ui.ide,
  org.eclipse.ui.console,
- org.eclipse.core.filesystem
+ org.eclipse.core.filesystem,
+ org.eclipse.search
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.dcarew.pythontools.ui
