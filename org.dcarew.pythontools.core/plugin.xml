@@ -49,4 +49,22 @@
       </launchConfigurationType>
    </extension>
 
+   <!-- debugging -->
+   <extension
+      id="breakpointMarker"
+      point="org.eclipse.core.resources.markers">
+
+      <super type="org.eclipse.debug.core.lineBreakpointMarker"/>
+      <persistent value="true"/>
+   </extension>
+
+   <extension point="org.eclipse.debug.core.breakpoints">
+      <breakpoint
+            class="org.dcarew.pythontools.core.debugger.PythonBreakpoint"
+            id="org.dcarew.pythontools.core.lineBreakpoint"
+            markerType="org.dcarew.pythontools.core.breakpointMarker"
+            name="Python breakpoint">
+      </breakpoint>
+   </extension>
+
 </plugin>

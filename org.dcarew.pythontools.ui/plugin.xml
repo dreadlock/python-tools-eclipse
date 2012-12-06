@@ -175,4 +175,97 @@
       </wizard>      
    </extension>
 
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.dcarew.pythontools.ui.properties.PythonProjectPropertyPage"
+            id="org.dcarew.pythontools.ui.properties.pythonPage"
+            name="Python">
+            
+         <enabledWhen>
+            <adapt type="org.eclipse.core.resources.IProject"/>
+         </enabledWhen>
+      </page>
+   </extension>
+   
+      <!-- This is possibly not needed (and has a dependency on the JDT), but is nice to have -->
+   <extension
+         point="org.eclipse.jdt.ui.javaElementFilters">
+      <filter
+          id="org.dcarew.pythontools.ui.pycFilter"
+          name="Python compiled files"
+          description="Hide Python compiled files (.pyc)"
+          targetId="org.eclipse.jdt.ui.PackageExplorer"
+          pattern="*.pyc"/>
+   </extension>
+   
+   <!-- Search -->
+   
+   <extension point="org.eclipse.search.searchPages">
+      <page id="org.dcarew.pythontools.ui.searchPage"
+         icon="icons/search_obj.png"
+         label="Python Search"
+         sizeHint="460,160"
+         extensions="py:90"
+         showScopeSection="true"
+         canSearchEnclosingProjects="true"
+         class="org.dcarew.pythontools.ui.search.PythonSearchPage">
+      </page>
+   </extension>
+   
+   <!-- debugger -->
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            targetID="org.dcarew.pythontools.ui.editors.python"
+            id="org.dcarew.pythontools.ui.breakpointActions">
+         <action
+               label="Toggle Breakpoint"
+               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+               actionID="RulerDoubleClick"
+               id="org.dcarew.pythontools.ui.breakpointActions.toggle">
+         </action>
+      </editorContribution>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            targetID="#PythonEditorRulerContext"
+            id="org.dcarew.pythontools.ui.CompilationUnitRulerPopupActions">
+         <action
+               label="Enable Breakpoint"
+               class="org.eclipse.debug.ui.actions.RulerEnableDisableBreakpointActionDelegate"
+               menubarPath="debug"
+               id="org.dcarew.pythontools.ui.breakpointActions.menuEnableDisable">
+         </action>
+         <action
+               class="org.eclipse.debug.ui.actions.RulerToggleBreakpointActionDelegate"
+               icon="icons/obj16/brkp_obj.gif"
+               id="org.dcarew.pythontools.ui.breakpointActions.menuToggle"
+               label="Toggle Breakpoint"
+               menubarPath="debug">
+         </action>
+      </viewerContribution>
+   </extension>
+   
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.dcarew.pythontools.ui.editors.PythonEditor"
+            class="org.dcarew.pythontools.ui.debugger.PythonBreakpointAdapterFactory">
+         <adapter
+               type="org.eclipse.debug.ui.actions.IToggleBreakpointsTarget">
+         </adapter>
+      </factory>
+   </extension>
+   
+   <extension
+         point="org.eclipse.debug.ui.debugModelPresentations">
+      <debugModelPresentation
+         class="org.dcarew.pythontools.ui.debugger.PythonDebugModelPresentation"
+         id="org.dcarew.pythontools.ui.debugger">
+      </debugModelPresentation>
+   </extension>
+   
 </plugin>

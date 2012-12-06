@@ -28,7 +28,6 @@ public class PythonEditor extends TextEditor {
     setSourceViewerConfiguration(new PythonEditorSourceViewerConfiguration(this,
         getPreferenceStore()));
 
-    // TODO:
     setRulerContextMenuId("#PythonEditorRulerContext");
 
     setDocumentProvider(new PythonDocumentProvider());
