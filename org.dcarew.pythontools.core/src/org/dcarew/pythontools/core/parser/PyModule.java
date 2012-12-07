@@ -19,36 +19,34 @@ public class PyModule extends PyNode {
    * {"function":{"location":{"col_offset":0,"lineno":267},"name":"_Gsutil"}},
    * {"function":{"location":{"col_offset":0,"lineno":272},"name":"_ExecuteCommand"}} ]}
    */
-  
+
   static PyModule parseJson(LineMapper lineMapper, String str) {
     try {
       JSONObject json = new JSONObject(str);
 
       JSONArray arr = json.getJSONArray("module");
       PyModule module = new PyModule();
-      
+
       for (int i = 0; i < arr.length(); i++) {
         JSONObject obj = arr.getJSONObject(i);
-        
+
         if (obj.has("import")) {
-          // TODO:
-          
+          parseImport(lineMapper, module, obj.getJSONObject("import"));
         } else if (obj.has("class")) {
-          // TODO:
-          
+          parseClass(lineMapper, module, obj.getJSONObject("class"));
         } else if (obj.has("function")) {
-          // TODO:
           parseFunction(lineMapper, module, obj.getJSONObject("function"));
         } else {
           // TODO:
-          
+          System.out.println("unexpected: " + obj);
         }
       }
-      
+
       return module;
     } catch (JSONException e) {
-      // TODO Auto-generated catch block
+      // TODO:
       e.printStackTrace();
+
       return new PyModule();
     }
   }
@@ -57,14 +55,54 @@ public class PyModule extends PyNode {
 
   }
 
-  private static void parseFunction(LineMapper lineMapper, PyModule module, JSONObject obj) throws JSONException {
-    // TODO:
+  private static void parseImport(LineMapper mapper, PyNode parent, JSONObject obj)
+      throws JSONException {
     JSONObject location = obj.getJSONObject("location");
-    
-    PyFunction function = new PyFunction(obj.getString("name"));
-    function.setLocation(lineMapper.getOffset(location.getInt("lineno"), location.getInt("col_offset")));
-    
-    module.addChild(function);
+
+    PyImport pyimport = new PyImport(obj.getString("name"));
+    pyimport.setLocation(mapper.refineOffset(
+        mapper.getOffset(location.getInt("lineno"), location.getInt("col_offset")),
+        pyimport.getName()));
+
+    parent.addChild(pyimport);
+  }
+
+  private static void parseFunction(LineMapper mapper, PyNode parent, JSONObject obj)
+      throws JSONException {
+    JSONObject location = obj.getJSONObject("location");
+
+    PyFunction pyfunction = new PyFunction(obj.getString("name"));
+    pyfunction.setLocation(mapper.refineOffset(
+        mapper.getOffset(location.getInt("lineno"), location.getInt("col_offset")),
+        pyfunction.getName()));
+
+    parent.addChild(pyfunction);
+  }
+
+  private static void parseClass(LineMapper mapper, PyNode parent, JSONObject obj)
+      throws JSONException {
+    JSONObject location = obj.getJSONObject("location");
+
+    PyClass pyclass = new PyClass(obj.getString("name"));
+    pyclass.setLocation(mapper.refineOffset(
+        mapper.getOffset(location.getInt("lineno"), location.getInt("col_offset")),
+        pyclass.getName()));
+
+    parent.addChild(pyclass);
+
+    // parse children
+    JSONArray arr = obj.getJSONArray("children");
+
+    for (int i = 0; i < arr.length(); i++) {
+      JSONObject child = arr.getJSONObject(i);
+
+      if (child.has("function")) {
+        parseFunction(mapper, pyclass, child.getJSONObject("function"));
+      } else {
+        // TODO:
+
+      }
+    }
   }
 
 }

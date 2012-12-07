@@ -1,7 +1,10 @@
 #parse the given python file, and dump the ast tree to stdout as JSON
 
-import sys
 import ast
+import json
+import sys
+
+#from pprint import pprint
 
 myVar = 0
 
@@ -14,7 +17,9 @@ class MyClass:
     print self + two
     
 
-# TODO: clean up the printing
+# TODO: clean up the printing; better json output, using the json library
+# TODO: if __name__ == '__main__':
+# TODO: top level assignments?
 
 def printModule(name, module):
   indent = '  '
@@ -28,6 +33,8 @@ def printModule(name, module):
       printFunctionDef(child, indent)
     elif isinstance(child, ast.Import):
       printImport(child, indent)
+    #elif isinstance(child, ast.If):
+    #  printIf(child, indent)
     #else:
     #  print '%s%s' % (indent, type(child))
       
@@ -36,8 +43,8 @@ def printModule(name, module):
 
 def printClassDef(node, indent):
   # identifier name, expr* bases, stmt* body, expr* decorator_list
-  print '%s{"class":{"name":"%s","location":%s,"children":[' % (
-      indent, node.name, location(node))
+  print '%s{"class":{"name":"%s","location":%s,"doc":%s,"children":[' % (
+      indent, node.name, location(node), docFor(node))
   
   for child in node.body:
     if isinstance(child, ast.FunctionDef):
@@ -48,15 +55,28 @@ def printClassDef(node, indent):
 
 def printFunctionDef(node, indent):
   # identifier name, arguments args, stmt* body, expr* decorator_list
-  print '%s{"function":{"name":"%s","location":%s}},' % (
-    indent, node.name, location(node))
+  #pprint (dir(node.name))
+  print '%s{"function":{"name":"%s","location":%s,"doc":%s}},' % (
+    indent, node.name, location(node), docFor(node))
 
 
 def printImport(node, indent):
-  # alias* names
+  # Import(alias* names)
   # alias = (identifier name, identifier? asname)
-  # TODO: use node
-  print '%s{"import":"%s"},' % (indent, node)
+  #TODO: process the names list
+  print '%s{"import":{"name":"%s","location":%s}},' % (
+    indent, node.names[0].name, location(node))
+
+
+#def printIf(node, indent):
+#  # If(expr test, stmt* body, stmt* orelse)
+#  main = "__name__ == '__main__'"
+#  mainCheck = "Compare(left=Name(id='__name__', ctx=Load()), ops=[Eq()],"
+#" comparators=[Str(s='__main__')])";
+#  
+#  if ast.dump(node.test) is mainCheck:
+#    print '%s{"if":{"name":"%s","location":%s}},' % (
+#      indent, main, location(node))
 
 
 def location(identifier):
@@ -76,6 +96,10 @@ def processStdin():
   printModule('stdin', module)
   
   
+def docFor(node):
+  return json.JSONEncoder().encode(ast.get_docstring(node, clean=True))
+  
+    
 if __name__ == '__main__':
   # if sys args are given, read from and process each file
   # else read from stdin
