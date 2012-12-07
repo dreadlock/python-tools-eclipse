@@ -18,8 +18,10 @@ import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfiguration {
   private PythonEditor editor;
   private MonoReconciler reconciler;
-  private PythonScanner scanner;
-
+  private PythonCodeScanner scanner;
+  private PythonCommentScanner commentScanner;
+  private PythonStringScanner stringScanner;
+  
   public PythonEditorSourceViewerConfiguration(PythonEditor editor, IPreferenceStore preferenceStore) {
     super(preferenceStore);
 
@@ -48,15 +50,14 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
   @Override
   public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
     ContentAssistant assistant = new ContentAssistant();
-    
-    // TODO: no code completions in strings
+
     assistant.setContentAssistProcessor(new PythonContentAssistProcessor(),
         IDocument.DEFAULT_CONTENT_TYPE);
 
     return assistant;
   }
 
-  // TODO:
+  // TODO: set the indent from the current style
 //  @Override
 //  public String[] getIndentPrefixes(ISourceViewer sourceViewer, String contentType) {
 //    return new String[] {"  ", ""};
@@ -64,31 +65,54 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
 
   @Override
   public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-    return new String[] {IDocument.DEFAULT_CONTENT_TYPE, PythonPartitionScanner.PYTHON_COMMENT};
+    return new String[] {
+        IDocument.DEFAULT_CONTENT_TYPE, PythonPartitionScanner.PYTHON_COMMENT,
+        PythonPartitionScanner.PYTHON_STRING};
   }
 
   @Override
   public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
     PresentationReconciler reconciler = new PresentationReconciler();
 
-    DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getScanner());
+    // TODO: keywords don't always get correctly damaged (i.e., type Nonee)
+    DefaultDamagerRepairer dr = new DefaultDamagerRepairer(getCodeScanner());
     reconciler.setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
     reconciler.setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
 
-    DefaultDamagerRepairer ndr = new DefaultDamagerRepairer(getScanner());
-    reconciler.setDamager(ndr, PythonPartitionScanner.PYTHON_COMMENT);
-    reconciler.setRepairer(ndr, PythonPartitionScanner.PYTHON_COMMENT);
+    dr = new DefaultDamagerRepairer(getCommentScanner());
+    reconciler.setDamager(dr, PythonPartitionScanner.PYTHON_COMMENT);
+    reconciler.setRepairer(dr, PythonPartitionScanner.PYTHON_COMMENT);
+
+    dr = new DefaultDamagerRepairer(getStringScanner());
+    reconciler.setDamager(dr, PythonPartitionScanner.PYTHON_STRING);
+    reconciler.setRepairer(dr, PythonPartitionScanner.PYTHON_STRING);
 
     return reconciler;
   }
 
-  protected PythonScanner getScanner() {
+  protected PythonCodeScanner getCodeScanner() {
     if (scanner == null) {
-      scanner = new PythonScanner();
+      scanner = new PythonCodeScanner();
       scanner.setDefaultReturnToken(new Token(new TextAttribute(null)));
     }
 
     return scanner;
   }
 
+  protected PythonCommentScanner getCommentScanner() {
+    if (commentScanner == null) {
+      commentScanner = new PythonCommentScanner();
+    }
+
+    return commentScanner;
+  }
+  
+  protected PythonStringScanner getStringScanner() {
+    if (stringScanner == null) {
+      stringScanner = new PythonStringScanner();
+    }
+
+    return stringScanner;
+  }
+  
 }
