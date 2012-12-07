@@ -1,4 +1,6 @@
-#parse the given python file, and dump the ast tree to stdout as JSON
+#!/usr/bin/env python
+
+"""Parse the given Python file and dump the ast tree to stdout as JSON."""
 
 import ast
 import json
