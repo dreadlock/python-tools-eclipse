@@ -87,12 +87,12 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
         runtimeProcess.destroy();
       }
 
-      throw newDebugException("Error starting Dart VM process");
+      throw newDebugException("Error starting the Python interpreter");
     }
 
     //eclipseProcess.setAttribute(IProcess.ATTR_CMDLINE, generateCommandLine(commands));
 
-//    if (enableDebugging && !DartCore.isWindows()) {
+//    if (enableDebugging) {
 //      ServerDebugTarget debugTarget = new ServerDebugTarget(launch, eclipseProcess, connectionPort);
 //
 //      try {

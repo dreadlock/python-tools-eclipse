@@ -280,7 +280,7 @@ public class PythonSearchPage extends DialogPage implements ISearchPage {
     }
     updateOKStatus();
 
-    // TODO: 3.7 only
+    // This is 3.7 only.
 //    IEditorInput editorInput = getActiveEditorInput();
 //
 //    getContainer().setActiveEditorCanProvideScopeSelection(

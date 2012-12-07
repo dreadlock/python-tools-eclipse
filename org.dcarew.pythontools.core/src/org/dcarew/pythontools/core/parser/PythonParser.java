@@ -3,11 +3,13 @@ package org.dcarew.pythontools.core.parser;
 import org.dcarew.pythontools.core.PythonCorePlugin;
 import org.dcarew.pythontools.core.utils.ProcessRunner;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -36,17 +38,17 @@ public class PythonParser {
 
         if (runner.execute(contents) == 0) {
           LineMapper mapper = new LineMapper(contents);
-          
+
           return PyModule.parseJson(mapper, runner.getStdout());
         }
       } else {
+        // TODO: test this path
         ProcessRunner runner = new ProcessRunner(new File("."), pythonPath, getPyParsePath(),
             file.getLocation().toOSString());
 
         if (runner.execute() == 0) {
-          // TODO: get file contents
-          LineMapper mapper = new LineMapper();
-          
+          LineMapper mapper = new LineMapper(getContents(file));
+
           return PyModule.parseJson(mapper, runner.getStdout());
         }
       }
@@ -80,4 +82,24 @@ public class PythonParser {
 
     return null;
   }
+
+  private String getContents(IFile file) throws IOException {
+    try {
+      InputStreamReader reader = new InputStreamReader(file.getContents(), file.getCharset());
+
+      StringBuilder builder = new StringBuilder();
+      char[] buffer = new char[4096];
+      int count = reader.read(buffer);
+
+      while (count != -1) {
+        builder.append(buffer, 0, count);
+        count = reader.read(buffer);
+      }
+
+      return builder.toString();
+    } catch (CoreException ce) {
+      throw new IOException(ce);
+    }
+  }
+
 }

@@ -223,7 +223,8 @@ litigation.
          id="org.dcarew.pythontools.core"
          download-size="0"
          install-size="0"
-         version="0.3.5.qualifier"/>
+         version="0.3.5.qualifier"
+         unpack="false"/>
 
    <plugin
          id="org.dcarew.pythontools.ui"
