@@ -19,7 +19,7 @@ class MyClass:
 def printModule(name, module):
   indent = '  '
   
-  print '{"module": ['
+  print '{"file":"%s","module": [' % name
   
   for child in module.body:
     if isinstance(child, ast.ClassDef):
@@ -55,8 +55,8 @@ def printFunctionDef(node, indent):
 def printImport(node, indent):
   # alias* names
   # alias = (identifier name, identifier? asname)
-  # TODO:
-  print '%s{"import":"foo"},' % (indent)
+  # TODO: use node
+  print '%s{"import":"%s"},' % (indent, node)
 
 
 def location(identifier):

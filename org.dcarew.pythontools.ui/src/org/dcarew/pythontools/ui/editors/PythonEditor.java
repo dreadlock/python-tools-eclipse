@@ -1,9 +1,15 @@
 package org.dcarew.pythontools.ui.editors;
 
+import org.dcarew.pythontools.core.parser.PyModule;
+import org.dcarew.pythontools.core.parser.PyNode;
+import org.dcarew.pythontools.core.parser.PythonParser;
 import org.dcarew.pythontools.ui.PythonUIPlugin;
 import org.dcarew.pythontools.ui.preferences.PreferenceConstants;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.DocumentEvent;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension3;
+import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.source.DefaultCharacterPairMatcher;
@@ -20,6 +26,8 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 public class PythonEditor extends TextEditor {
   private PythonEditorOutlinePage outlinePage;
   private EditorImageUpdater imageUpdater;
+  private PyModule model;
+
   private BracketInserter bracketInserter = new BracketInserter(this);
 
   public PythonEditor() {
@@ -68,6 +76,18 @@ public class PythonEditor extends TextEditor {
     if (sourceViewer instanceof ITextViewerExtension) {
       ((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(bracketInserter);
     }
+
+    getDocument().addDocumentListener(new IDocumentListener() {
+      @Override
+      public void documentAboutToBeChanged(DocumentEvent event) {
+
+      }
+
+      @Override
+      public void documentChanged(DocumentEvent event) {
+        handleDocumentModified();
+      }
+    });
   }
 
   @Override
@@ -109,13 +129,22 @@ public class PythonEditor extends TextEditor {
     if (outlinePage != null) {
       outlinePage.handleEditorReconcilation();
     }
+  }
 
-    // TODO:
-//    PythonParser parser = new PythonParser(getText());
-//
-//    PyModule module = parser.parse();
-//
-//    System.out.println(module);
+  public IDocument getDocument() {
+    return getSourceViewer().getDocument();
+  }
+
+  protected PyModule getModel() {
+    if (model == null) {
+      model = new PythonParser(getText()).parse();
+    }
+
+    return model;
+  }
+
+  protected void handleDocumentModified() {
+    model = null;
   }
 
   ISourceViewer getISourceViewer() {
@@ -160,6 +189,14 @@ public class PythonEditor extends TextEditor {
 
       default:
         throw new IllegalArgumentException();
+    }
+  }
+
+  public void selectAndReveal(PyNode node) {
+    if (node.getOffset() != -1) {
+      int length = node.getName() == null ? 0 : node.getName().length();
+
+      selectAndReveal(node.getOffset(), length);
     }
   }
 

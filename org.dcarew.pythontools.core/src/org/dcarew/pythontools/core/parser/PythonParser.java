@@ -35,14 +35,19 @@ public class PythonParser {
         ProcessRunner runner = new ProcessRunner(new File("."), pythonPath, getPyParsePath());
 
         if (runner.execute(contents) == 0) {
-          return PyModule.parseJson(runner.getStdout());
+          LineMapper mapper = new LineMapper(contents);
+          
+          return PyModule.parseJson(mapper, runner.getStdout());
         }
       } else {
         ProcessRunner runner = new ProcessRunner(new File("."), pythonPath, getPyParsePath(),
             file.getLocation().toOSString());
 
         if (runner.execute() == 0) {
-          return PyModule.parseJson(runner.getStdout());
+          // TODO: get file contents
+          LineMapper mapper = new LineMapper();
+          
+          return PyModule.parseJson(mapper, runner.getStdout());
         }
       }
 
