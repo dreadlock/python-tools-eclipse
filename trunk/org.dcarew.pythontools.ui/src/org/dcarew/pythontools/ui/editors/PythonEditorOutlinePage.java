@@ -36,7 +36,8 @@ public class PythonEditorOutlinePage extends ContentOutlinePage {
 		getTreeViewer().setLabelProvider(new DelegatingStyledCellLabelProvider(new PyNodeLabelProvider()));
     getTreeViewer().setInput(editor.getModel());
 
-    //getTreeViewer().expandToLevel(3);
+    // TODO: do we want to do this, or let the selection synchronization handle it?
+    getTreeViewer().expandToLevel(2);
 
     getTreeViewer().addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
