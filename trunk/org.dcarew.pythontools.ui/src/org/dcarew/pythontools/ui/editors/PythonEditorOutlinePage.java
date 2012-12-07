@@ -1,16 +1,21 @@
 package org.dcarew.pythontools.ui.editors;
 
+import org.dcarew.pythontools.core.parser.PyNode;
+import org.dcarew.pythontools.ui.PythonUIPlugin;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
 /**
- * The outline page for the Go editor.
+ * The outline page for the Python editor.
  */
 public class PythonEditorOutlinePage extends ContentOutlinePage {
-	//private PythonEditor editor;
+	private PythonEditor editor;
 
 	/**
 	 * Create a new GoEditorOutlinePage.
@@ -19,104 +24,65 @@ public class PythonEditorOutlinePage extends ContentOutlinePage {
 	 * @param editor
 	 */
 	public PythonEditorOutlinePage(PythonEditor editor) {
-		//this.editor = editor;
+		this.editor = editor;
 	}
 
 	@Override
 	public void createControl(Composite parent) {
 		super.createControl(parent);
 		
-//		getTreeViewer().setContentProvider(new OutlinePageContentProvider());
-//		getTreeViewer().setLabelProvider(new DelegatingStyledCellLabelProvider(new NodeLabelProvider()));
-		getTreeViewer().addSelectionChangedListener(this);
-		getTreeViewer().addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				handleSelectionChanged();
-			}
-		});
-		
-		refresh();
-	}
+		getTreeViewer().setContentProvider(new PyNodeContentProvider());
+		// DecoratingStyledCellLabelProvider?
+		getTreeViewer().setLabelProvider(new DelegatingStyledCellLabelProvider(new PyNodeLabelProvider()));
+    getTreeViewer().setInput(editor.getModel());
 
-	protected void handleEditorReconcilation() {
-		if (!getControl().isDisposed()) {
-			refreshAsync();
-		}
-	}
-	
-	protected void handleSelectionChanged() {
-//		Object sel = ((IStructuredSelection)getTreeViewer().getSelection()).getFirstElement();
-//		
-//		if (sel instanceof Node) {
-//			IDocument document = documentProvider.getDocument(editor.getEditorInput());
-//			
-//			Node node = (Node)sel;
-//			
-//			int line = node.getLine() - 1;
-//			
-//			if (line != -1) {
-//				try {
-//					editor.selectAndReveal(document.getLineOffset(line), document.getLineLength(line));
-//				} catch (BadLocationException ble) {
-//					ble.printStackTrace();
-//				}
-//			}
-//		}
-	}
+    //getTreeViewer().expandToLevel(3);
 
-	private void refreshAsync() {
-		Display.getDefault().asyncExec(new Runnable() {
-			@Override
-            public void run() {
-				refresh();
-			}
-		});
-	}
-	
-	private void refresh() {
-//		try {
-//			if (!getTreeViewer().getControl().isDisposed()) {
-//				IDocument document = documentProvider.getDocument(editor.getEditorInput());
-//				
-//				if (document != null) {
-//					CodeContext codeContext = null;
-//					
-//					IEditorInput input = editor.getEditorInput();
-//					
-//					if (input instanceof IFileEditorInput) {
-//						IFile file = ((IFileEditorInput)input).getFile();
-//						
-//						codeContext = CodeContext.getCodeContext(
-//								file.getProject(),
-//								file.getLocation().toOSString(),
-//								document.get(), false);
-//						
-//					} else if (input instanceof FileStoreEditorInput) {
-//						URI uri = ((FileStoreEditorInput)input).getURI();
-//						
-//						codeContext = CodeContext.getCodeContext(
-//								new File(uri).getPath(), document.get(), false);
-//					}
-//					
-//					if (codeContext != null) {
-//						if (getTreeViewer().getInput() == null) {
-//							getTreeViewer().setInput(codeContext);
-//						} else {
-//							OutlinePageContentProvider contentProvider =
-//								(OutlinePageContentProvider)getTreeViewer().getContentProvider();
-//							
-//							contentProvider.setCodeContext(codeContext);
-//						}
-//					}
-//				}
-//			}
-//		}
-//		catch (Throwable exception) {
-//			Activator.logError(exception);
-//			
-//			getTreeViewer().setInput(null);
-//		}
-	}
-	
+    getTreeViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
+      public void selectionChanged(SelectionChangedEvent event) {
+        handleTreeViewerSelectionChanged(event.getSelection());
+      }
+    });
+  }
+
+  protected void handleEditorReconcilation() {
+    if (!getControl().isDisposed()) {
+      refreshAsync();
+    }
+  }
+
+  protected void handleTreeViewerSelectionChanged(ISelection selection) {
+    if (selection instanceof IStructuredSelection) {
+      Object sel = ((IStructuredSelection) selection).getFirstElement();
+
+      if (sel instanceof PyNode) {
+        PyNode node = (PyNode) sel;
+
+        editor.selectAndReveal(node);
+      }
+    }
+  }
+
+  private void refresh() {
+    try {
+      if (!getTreeViewer().getControl().isDisposed()) {
+        getTreeViewer().refresh(editor.getModel());
+      }
+    } catch (Throwable exception) {
+      PythonUIPlugin.logError(exception);
+
+      getTreeViewer().setInput(null);
+    }
+  }
+
+  private void refreshAsync() {
+    Display.getDefault().asyncExec(new Runnable() {
+      @Override
+      public void run() {
+        refresh();
+      }
+    });
+  }
+  
 }
