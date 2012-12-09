@@ -1,6 +1,8 @@
 package org.dcarew.pythontools.ui.preferences;
 
 import org.dcarew.pythontools.core.PythonCorePlugin;
+import org.dcarew.pythontools.core.pylint.IPylintConfig;
+import org.dcarew.pythontools.core.pylint.PylintConfigManager;
 import org.dcarew.pythontools.core.utils.PythonLocator;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -20,6 +22,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.osgi.framework.Version;
+
+// TODO: add a preference for the pylint configuration file
 
 public class PythonPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
   private Text pythonText;
@@ -96,6 +100,11 @@ public class PythonPreferencePage extends PreferencePage implements IWorkbenchPr
     pythonText.setText(nonNull(PythonCorePlugin.getPlugin().getPythonPath()));
     pylintText.setText(nonNull(PythonCorePlugin.getPlugin().getPylintPath()));
 
+    // TODO:
+    for (IPylintConfig config : PylintConfigManager.getAllConfigs()) {
+      System.out.println(config);
+    }
+    
     return composite;
   }
 

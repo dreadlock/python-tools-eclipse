@@ -19,10 +19,12 @@ import java.util.Map;
 public class PythonUIPlugin extends AbstractUIPlugin {
 
   // The plug-in ID
-  public static final String PLUGIN_ID = "org.dcarew.pythontools.ui"; //$NON-NLS-1$
+  public static final String PLUGIN_ID = "org.dcarew.pythontools.ui";
 
   public static final String EDITOR_ID = "org.dcarew.pythontools.ui.editors.python";
-  
+
+  public static final String PREF_PAGE_ID = "org.dcarew.pythontools.ui.preferences.mainPage";
+
   // The shared instance
   private static PythonUIPlugin plugin;
 
@@ -60,7 +62,7 @@ public class PythonUIPlugin extends AbstractUIPlugin {
   public IPreferenceStore getCombinedPreferenceStore() {
     if (combinedPreferenceStore == null) {
       IPreferenceStore generalTextStore = EditorsUI.getPreferenceStore();
-      
+
       combinedPreferenceStore = new ChainedPreferenceStore(new IPreferenceStore[] {
           getPreferenceStore(), generalTextStore});
     }

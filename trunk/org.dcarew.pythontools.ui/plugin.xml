@@ -267,5 +267,12 @@
          id="org.dcarew.pythontools.ui.debugger">
       </debugModelPresentation>
    </extension>
-   
+
+   <extension point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+         class="org.dcarew.pythontools.ui.resolutions.PythonResolutionGenerator"
+         markerType="org.dcarew.pythontools.core.pythonMarker">
+      </markerResolutionGenerator>
+   </extension>
+    
 </plugin>
