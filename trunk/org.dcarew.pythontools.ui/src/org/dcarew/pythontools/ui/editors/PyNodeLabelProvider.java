@@ -1,8 +1,11 @@
 package org.dcarew.pythontools.ui.editors;
 
+import org.dcarew.pythontools.core.parser.PyAssign;
 import org.dcarew.pythontools.core.parser.PyClass;
 import org.dcarew.pythontools.core.parser.PyFunction;
+import org.dcarew.pythontools.core.parser.PyIf;
 import org.dcarew.pythontools.core.parser.PyImport;
+import org.dcarew.pythontools.core.parser.PyModule;
 import org.dcarew.pythontools.core.parser.PyNode;
 import org.dcarew.pythontools.ui.PythonUIPlugin;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
@@ -36,18 +39,19 @@ public class PyNodeLabelProvider extends LabelProvider implements IStyledLabelPr
       return PythonUIPlugin.getImage("icons/ast/imp_obj.gif");
     }
 
-    return PythonUIPlugin.getImage("python_16.png");
-  }
-
-  @Override
-  public String getText(Object element) {
-    PyNode node = (PyNode) element;
-
-    if (element instanceof PyFunction) {
-      return node.getName() + "()";
-    } else {
-      return node.getName();
+    if (element instanceof PyAssign) {
+      return PythonUIPlugin.getImage("icons/ast/field_public_obj.gif");
     }
+
+    if (element instanceof PyIf) {
+      return PythonUIPlugin.getImage("icons/ast/methpri_obj.gif");
+    }
+
+    if (element instanceof PyModule) {
+      return PythonUIPlugin.getImage("icons/ast/package_obj.gif");
+    }
+
+    return PythonUIPlugin.getImage("python_16.png");
   }
 
   @Override
@@ -63,6 +67,17 @@ public class PyNodeLabelProvider extends LabelProvider implements IStyledLabelPr
     }
 
     return string;
+  }
+
+  @Override
+  public String getText(Object element) {
+    PyNode node = (PyNode) element;
+
+    if (element instanceof PyFunction) {
+      return node.getName() + "()";
+    } else {
+      return node.getName();
+    }
   }
 
   private String getAuxText(PyNode node) {
