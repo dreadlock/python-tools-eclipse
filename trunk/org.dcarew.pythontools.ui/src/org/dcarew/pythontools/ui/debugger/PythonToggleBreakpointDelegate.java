@@ -15,58 +15,57 @@ import org.eclipse.ui.IWorkbenchPart;
 
 public class PythonToggleBreakpointDelegate implements IToggleBreakpointsTarget {
 
-	@Override
-	public void toggleLineBreakpoints(IWorkbenchPart part, ISelection selection)
-			throws CoreException {
-	  PythonEditor editor = (PythonEditor) part;
+  @Override
+  public void toggleLineBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
+    PythonEditor editor = (PythonEditor) part;
 
-		if (editor != null) {
-			IResource resource = (IResource) editor.getEditorInput().getAdapter(IResource.class);
-			ITextSelection textSelection = (ITextSelection) selection;
-			int lineNumber = textSelection.getStartLine();
+    if (editor != null) {
+      IResource resource = (IResource) editor.getEditorInput().getAdapter(IResource.class);
+      ITextSelection textSelection = (ITextSelection) selection;
+      int lineNumber = textSelection.getStartLine();
 
-			IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager()
-					.getBreakpoints(PythonCorePlugin.PLUGIN_ID);
+      IBreakpoint[] breakpoints = DebugPlugin.getDefault().getBreakpointManager().getBreakpoints(
+          PythonCorePlugin.PLUGIN_ID);
 
-			for (int i = 0; i < breakpoints.length; i++) {
-				IBreakpoint breakpoint = breakpoints[i];
-				if (resource.equals(breakpoint.getMarker().getResource())) {
-					if (((ILineBreakpoint) breakpoint).getLineNumber() == lineNumber + 1) {
-						breakpoint.delete();
-						return;
-					}
-				}
-			}
+      for (int i = 0; i < breakpoints.length; i++) {
+        IBreakpoint breakpoint = breakpoints[i];
+        if (resource.equals(breakpoint.getMarker().getResource())) {
+          if (((ILineBreakpoint) breakpoint).getLineNumber() == lineNumber + 1) {
+            breakpoint.delete();
+            return;
+          }
+        }
+      }
 
-			PythonBreakpoint breakpoint = new PythonBreakpoint(resource, lineNumber + 1);
-			DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(breakpoint);
-		}
-	}
+      PythonBreakpoint breakpoint = new PythonBreakpoint(resource, lineNumber + 1);
+      DebugPlugin.getDefault().getBreakpointManager().addBreakpoint(breakpoint);
+    }
+  }
 
-	@Override
-	public boolean canToggleLineBreakpoints(IWorkbenchPart part, ISelection selection) {
-		return part instanceof PythonEditor;
-	}
+  @Override
+  public boolean canToggleLineBreakpoints(IWorkbenchPart part, ISelection selection) {
+    return part instanceof PythonEditor;
+  }
 
-	@Override
-	public void toggleMethodBreakpoints(IWorkbenchPart part, ISelection selection)
-			throws CoreException {
+  @Override
+  public void toggleMethodBreakpoints(IWorkbenchPart part, ISelection selection)
+      throws CoreException {
 
-	}
+  }
 
-	@Override
-	public boolean canToggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) {
-		return false;
-	}
+  @Override
+  public boolean canToggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) {
+    return false;
+  }
 
-	@Override
-	public void toggleWatchpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
+  @Override
+  public void toggleWatchpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
 
-	}
+  }
 
-	@Override
-	public boolean canToggleWatchpoints(IWorkbenchPart part, ISelection selection) {
-		return false;
-	}
+  @Override
+  public boolean canToggleWatchpoints(IWorkbenchPart part, ISelection selection) {
+    return false;
+  }
 
 }

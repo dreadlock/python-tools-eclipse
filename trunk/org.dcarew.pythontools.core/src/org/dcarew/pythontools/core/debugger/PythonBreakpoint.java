@@ -40,7 +40,7 @@ public class PythonBreakpoint extends LineBreakpoint {
   }
 
   public IFile getFile() {
-    return (IFile)getMarker().getResource();
+    return (IFile) getMarker().getResource();
   }
 
   public int getLine() {

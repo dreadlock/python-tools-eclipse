@@ -14,6 +14,16 @@ class DisableRuleResolution implements IMarkerResolution2 {
   }
 
   @Override
+  public String getDescription() {
+    return null;
+  }
+
+  @Override
+  public Image getImage() {
+    return PythonUIPlugin.getImage("icons/obj16/delete.gif");
+  }
+
+  @Override
   public String getLabel() {
     return "Disable the " + code + " rule entirely";
   }
@@ -22,18 +32,6 @@ class DisableRuleResolution implements IMarkerResolution2 {
   public void run(IMarker marker) {
     // TODO:
 
-  }
-
-  @Override
-  public String getDescription() {
-    return null;
-  }
-
-  @Override
-  public Image getImage() {
-    // TODO: customize this icon
-
-    return PythonUIPlugin.getImage("icons/python_16.png");
   }
 
 }

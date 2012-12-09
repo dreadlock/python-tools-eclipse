@@ -14,6 +14,7 @@ import java.net.URL;
 class ResourcePylintConfig implements IPylintConfig {
   private String name;
   private String resourcePath;
+
   //private String pluginId;
 
   public ResourcePylintConfig(IConfigurationElement element) {

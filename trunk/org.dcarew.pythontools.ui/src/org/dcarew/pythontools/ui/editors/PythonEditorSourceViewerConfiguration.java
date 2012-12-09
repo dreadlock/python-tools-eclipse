@@ -21,7 +21,7 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
   private PythonCodeScanner scanner;
   private PythonCommentScanner commentScanner;
   private PythonStringScanner stringScanner;
-  
+
   public PythonEditorSourceViewerConfiguration(PythonEditor editor, IPreferenceStore preferenceStore) {
     super(preferenceStore);
 
@@ -106,7 +106,7 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
 
     return commentScanner;
   }
-  
+
   protected PythonStringScanner getStringScanner() {
     if (stringScanner == null) {
       stringScanner = new PythonStringScanner();
@@ -114,5 +114,5 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
 
     return stringScanner;
   }
-  
+
 }

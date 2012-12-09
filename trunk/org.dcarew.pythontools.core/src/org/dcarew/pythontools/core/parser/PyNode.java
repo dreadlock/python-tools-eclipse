@@ -63,5 +63,5 @@ public abstract class PyNode {
   protected void setLocation(int offset) {
     this.offset = offset;
   }
-  
+
 }

@@ -1,4 +1,3 @@
-
 package org.dcarew.pythontools.ui.editors;
 
 import org.eclipse.jface.text.rules.IWordDetector;
@@ -26,5 +25,5 @@ class PythonWordDetector implements IWordDetector {
   public final static boolean wordStart(char c) {
     return c == '_' || Character.isJavaIdentifierStart(c);
   }
-  
+
 }

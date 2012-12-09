@@ -6,7 +6,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 public class PythonPreferenceInitializer extends AbstractPreferenceInitializer {
 
   public PythonPreferenceInitializer() {
-    
+
   }
 
   @Override

@@ -79,7 +79,7 @@ public class PythonPreferencePage extends PreferencePage implements IWorkbenchPr
     int widthHint = converter.convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
     GridDataFactory.swtDefaults().hint(widthHint, -1).applyTo(button);
     handleBrowseButton("Python", button, pythonText);
-    
+
     Group pylintGroup = new Group(composite, SWT.NONE);
     pylintGroup.setText("Pylint");
     GridDataFactory.fillDefaults().grab(true, false).applyTo(pylintGroup);
@@ -104,7 +104,7 @@ public class PythonPreferencePage extends PreferencePage implements IWorkbenchPr
     for (IPylintConfig config : PylintConfigManager.getAllConfigs()) {
       System.out.println(config);
     }
-    
+
     return composite;
   }
 
@@ -115,7 +115,7 @@ public class PythonPreferencePage extends PreferencePage implements IWorkbenchPr
         FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
         dialog.setText("Select Path to " + scriptName);
         String path = dialog.open();
-        
+
         if (path != null) {
           text.setText(path);
         }
