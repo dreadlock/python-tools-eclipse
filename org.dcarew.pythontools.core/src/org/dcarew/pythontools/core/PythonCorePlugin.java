@@ -36,23 +36,23 @@ public class PythonCorePlugin extends Plugin {
     if (!getPreferences().getBoolean("inited", false)) {
       initPython();
     }
-    
+
     // This is really not awesomely stable.
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(PythonResourceChangeBuilder.getBuilder(),
-        IResourceChangeEvent.POST_CHANGE); // PRE_BUILD
+    ResourcesPlugin.getWorkspace().addResourceChangeListener(
+        PythonResourceChangeBuilder.getBuilder(), IResourceChangeEvent.POST_CHANGE); // PRE_BUILD
   }
 
   private void initPython() {
     try {
       PythonLocator locator = new PythonLocator();
-      
+
       String pythonPath = locator.getDefaultPythonPath();
       String pylintPath = locator.getDefaultPylintPath();
-      
+
       getPreferences().putBoolean("inited", true);
       getPreferences().put("python", pythonPath == null ? "" : pythonPath);
       getPreferences().put("pylint", pylintPath == null ? "" : pylintPath);
-      
+
       getPreferences().flush();
     } catch (BackingStoreException e) {
 
@@ -61,7 +61,8 @@ public class PythonCorePlugin extends Plugin {
 
   @Override
   public void stop(BundleContext context) throws Exception {
-    ResourcesPlugin.getWorkspace().removeResourceChangeListener(PythonResourceChangeBuilder.getBuilder());
+    ResourcesPlugin.getWorkspace().removeResourceChangeListener(
+        PythonResourceChangeBuilder.getBuilder());
 
     plugin = null;
 
@@ -87,7 +88,7 @@ public class PythonCorePlugin extends Plugin {
   public static boolean isPythonFile(IFile file) {
     return "py".equals(file.getFileExtension());
   }
-  
+
   public IEclipsePreferences getPreferences() {
     if (prefs == null) {
       prefs = InstanceScope.INSTANCE.getNode(PLUGIN_ID);
@@ -95,27 +96,27 @@ public class PythonCorePlugin extends Plugin {
 
     return prefs;
   }
-  
+
   public String getPythonPath() {
     String path = getPreferences().get("python", null);
-    
+
     if (path != null && path.length() == 0) {
       return null;
     } else {
       return path;
     }
   }
-  
+
   public String getPylintPath() {
     String path = getPreferences().get("pylint", null);
-    
+
     if (path != null && path.length() == 0) {
       return null;
     } else {
       return path;
     }
   }
-  
+
   public void setPythonPath(String path) {
     try {
       getPreferences().put("python", path == null ? "" : path);

@@ -1,4 +1,3 @@
-
 package org.dcarew.pythontools.ui.editors;
 
 import org.eclipse.core.runtime.Assert;

@@ -68,11 +68,11 @@ public class PythonLaunchConfigWrapper {
   public String getScriptArguments() {
     return getStringValue(SCRIPT_ARGUMENTS);
   }
-  
+
   public String[] getScriptArgumentsAsArray() {
     return parseArgumentString(getScriptArguments());
   }
-  
+
   public String getInterpreterArguments() {
     return getStringValue(INTERPRETER_ARGUMENTS);
   }
@@ -80,7 +80,7 @@ public class PythonLaunchConfigWrapper {
   public String[] getInterpreterArgumentsAsArray() {
     return parseArgumentString(getInterpreterArguments());
   }
-  
+
   protected String getStringValue(String key) {
     try {
       return launchConfig.getAttribute(key, "");

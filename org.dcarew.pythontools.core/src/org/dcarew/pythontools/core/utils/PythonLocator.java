@@ -3,7 +3,7 @@ package org.dcarew.pythontools.core.utils;
 public class PythonLocator {
 
   public PythonLocator() {
-    
+
   }
 
   public String getDefaultPythonPath() {
@@ -13,5 +13,5 @@ public class PythonLocator {
   public String getDefaultPylintPath() {
     return null;
   }
-  
+
 }

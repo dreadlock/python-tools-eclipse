@@ -15,25 +15,26 @@ import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
  * The outline page for the Python editor.
  */
 public class PythonEditorOutlinePage extends ContentOutlinePage {
-	private PythonEditor editor;
+  private PythonEditor editor;
 
-	/**
-	 * Create a new GoEditorOutlinePage.
-	 * 
-	 * @param documentProvider
-	 * @param editor
-	 */
-	public PythonEditorOutlinePage(PythonEditor editor) {
-		this.editor = editor;
-	}
+  /**
+   * Create a new GoEditorOutlinePage.
+   * 
+   * @param documentProvider
+   * @param editor
+   */
+  public PythonEditorOutlinePage(PythonEditor editor) {
+    this.editor = editor;
+  }
 
-	@Override
-	public void createControl(Composite parent) {
-		super.createControl(parent);
-		
-		getTreeViewer().setContentProvider(new PyNodeContentProvider());
-		// DecoratingStyledCellLabelProvider?
-		getTreeViewer().setLabelProvider(new DelegatingStyledCellLabelProvider(new PyNodeLabelProvider()));
+  @Override
+  public void createControl(Composite parent) {
+    super.createControl(parent);
+
+    getTreeViewer().setContentProvider(new PyNodeContentProvider());
+    // DecoratingStyledCellLabelProvider?
+    getTreeViewer().setLabelProvider(
+        new DelegatingStyledCellLabelProvider(new PyNodeLabelProvider()));
     getTreeViewer().setInput(editor.getModel());
 
     // TODO: do we want to do this, or let the selection synchronization handle it?
@@ -85,5 +86,5 @@ public class PythonEditorOutlinePage extends ContentOutlinePage {
       }
     });
   }
-  
+
 }

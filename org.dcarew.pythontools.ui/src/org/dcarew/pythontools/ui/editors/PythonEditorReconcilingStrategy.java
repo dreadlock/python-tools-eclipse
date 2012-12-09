@@ -11,32 +11,32 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
  * @see GoEditorSourceViewerConfiguration
  */
 public class PythonEditorReconcilingStrategy implements IReconcilingStrategy {
-	private PythonEditor editor;
+  private PythonEditor editor;
 
-	/**
-	 * Create a new GoEditorReconcilingStrategy.
-	 * 
-	 * @param editor
-	 */
-	public PythonEditorReconcilingStrategy(PythonEditor editor) {
-		this.editor = editor;
-	}
+  /**
+   * Create a new GoEditorReconcilingStrategy.
+   * 
+   * @param editor
+   */
+  public PythonEditorReconcilingStrategy(PythonEditor editor) {
+    this.editor = editor;
+  }
 
-	@Override
-	public void setDocument(IDocument document) {
+  @Override
+  public void setDocument(IDocument document) {
 
-	}
+  }
 
-	@Override
-	public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion) {
-		// This really won't get called, as we indicate that we don't support incremental
-		// reconciliation.
-		editor.handleReconcilation(null);
-	}
+  @Override
+  public void reconcile(DirtyRegion dirtyRegion, IRegion subRegion) {
+    // This really won't get called, as we indicate that we don't support incremental
+    // reconciliation.
+    editor.handleReconcilation(null);
+  }
 
-	@Override
-	public void reconcile(IRegion partition) {
-		editor.handleReconcilation(partition);
-	}
+  @Override
+  public void reconcile(IRegion partition) {
+    editor.handleReconcilation(partition);
+  }
 
 }

@@ -11,5 +11,5 @@ public class ObjectUtils {
       return obj1.equals(obj2);
     }
   }
-  
+
 }

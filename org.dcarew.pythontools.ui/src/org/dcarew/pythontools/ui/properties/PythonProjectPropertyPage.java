@@ -20,7 +20,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 public class PythonProjectPropertyPage extends PropertyPage {
-  
+
   public PythonProjectPropertyPage() {
     noDefaultAndApplyButton();
   }
@@ -35,7 +35,7 @@ public class PythonProjectPropertyPage extends PropertyPage {
     if (true) {
       return composite;
     }
-    
+
     Group group = new Group(composite, SWT.NONE);
     group.setText("Enable Pylint");
     GridLayoutFactory.swtDefaults().extendedMargins(0, 0, 0, 3).applyTo(group);
@@ -62,7 +62,7 @@ public class PythonProjectPropertyPage extends PropertyPage {
       public void widgetSelected(SelectionEvent e) {
         PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(getShell(),
             PythonUIPlugin.PREF_PAGE_ID, null, null);
-        
+
         dialog.open();
       }
     });
@@ -98,8 +98,8 @@ public class PythonProjectPropertyPage extends PropertyPage {
   @Override
   public boolean performOk() {
     // TODO:
-    
+
     return true;
   }
-  
+
 }

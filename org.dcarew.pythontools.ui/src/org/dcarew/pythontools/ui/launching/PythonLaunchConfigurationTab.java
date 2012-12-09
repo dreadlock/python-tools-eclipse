@@ -77,7 +77,7 @@ public class PythonLaunchConfigurationTab extends AbstractLaunchConfigurationTab
             false, ResourcesPlugin.getWorkspace().getRoot(), IResource.FILE);
         dialog.setTitle("Select Python Script");
         dialog.setInitialPattern(".py");
-        
+
         if (Window.OK == dialog.open()) {
           IResource resource = (IResource) dialog.getResult()[0];
 

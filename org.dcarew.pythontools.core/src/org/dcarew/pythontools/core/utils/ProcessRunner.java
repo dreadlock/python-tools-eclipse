@@ -23,7 +23,7 @@ public class ProcessRunner {
   public int execute() throws IOException {
     return execute(null);
   }
-  
+
   public int execute(String stdinInput) throws IOException {
     stdout.setLength(0);
 
@@ -44,7 +44,7 @@ public class ProcessRunner {
       process.getOutputStream().write(data);
       process.getOutputStream().close();
     }
-    
+
     try {
       return process.waitFor();
     } catch (InterruptedException e) {

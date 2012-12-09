@@ -7,9 +7,9 @@ import org.eclipse.jface.viewers.Viewer;
 public class PyNodeContentProvider implements ITreeContentProvider {
 
   public PyNodeContentProvider() {
-    
+
   }
-  
+
   @Override
   public void dispose() {
 
