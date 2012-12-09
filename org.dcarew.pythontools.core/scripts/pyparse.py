@@ -6,95 +6,99 @@ import ast
 import json
 import sys
 
-#from pprint import pprint
-
-myVar = 0
-
-class MyClass:
-  def __init__(self):
-    print self
-  def FunctionA(self, one):
-    print self + one
-  def FunctionB(self, two):
-    print self + two
-    
-
-# TODO: clean up the printing; better json output, using the json library
-# TODO: if __name__ == '__main__':
-# TODO: top level assignments?
 
 def printModule(name, module):
-  indent = '  '
+  children = []
+  m = {'file': name, 'children': children, 'type': 'module'}
   
-  print '{"file":"%s","module": [' % name
-  
-  for child in module.body:
-    if isinstance(child, ast.ClassDef):
-      printClassDef(child, indent)
-    elif isinstance(child, ast.FunctionDef):
-      printFunctionDef(child, indent)
-    elif isinstance(child, ast.Import):
-      printImport(child, indent)
-    #elif isinstance(child, ast.If):
-    #  printIf(child, indent)
+  for node in module.body:
+    if isinstance(node, ast.ClassDef):
+      children.append(handleClassDef(node))
+    elif isinstance(node, ast.FunctionDef):
+      children.append(handleFunctionDef(node))
+    elif isinstance(node, ast.Import):
+      children.append(handleImport(node))
+    elif isinstance(node, ast.Assign):
+      n = handleAssign(node)
+      if n:
+        children.append(n)
+    elif isinstance(node, ast.If):
+      n = handleIf(node)
+      if n:
+        children.append(n)
     #else:
-    #  print '%s%s' % (indent, type(child))
-      
-  print ']}'
+    #  print '%s%s' % (indent, type(node))
 
+  print json.dumps(m, separators=(',',':'))
+  
 
-def printClassDef(node, indent):
+def handleClassDef(node):
   # identifier name, expr* bases, stmt* body, expr* decorator_list
-  print '%s{"class":{"name":"%s","location":%s,"doc":%s,"children":[' % (
-      indent, node.name, location(node), docFor(node))
+  children = []
+  c = {'type': 'class', 'children': children, 'start': location(node),
+    'docs': docFor(node)}
   
   for child in node.body:
     if isinstance(child, ast.FunctionDef):
-      printFunctionDef(child, indent + '  ')
-    
-  print '%s]}},' % indent
+      children.append(handleFunctionDef(child))
+   
+  return c
 
 
-def printFunctionDef(node, indent):
+def handleFunctionDef(node):
   # identifier name, arguments args, stmt* body, expr* decorator_list
-  #pprint (dir(node.name))
-  print '%s{"function":{"name":"%s","location":%s,"doc":%s}},' % (
-    indent, node.name, location(node), docFor(node))
+  func = {'type': 'function', 'name': node.name, 'start': location(node),
+    'docs': docFor(node)}
+  
+  return func
 
 
-def printImport(node, indent):
+def handleImport(node):
   # Import(alias* names)
   # alias = (identifier name, identifier? asname)
-  #TODO: process the names list
-  print '%s{"import":{"name":"%s","location":%s}},' % (
-    indent, node.names[0].name, location(node))
+  children = []
+  i = {'type': 'import', 'start': location(node), 'children': children}
+  
+  for child in node.names:
+    c = {'name': child.name}
+    if child.asname:
+      c['asname'] = child.asname
+    children.append(c)
+    
+  return i
 
 
-#def printIf(node, indent):
-#  # If(expr test, stmt* body, stmt* orelse)
-#  main = "__name__ == '__main__'"
-#  mainCheck = "Compare(left=Name(id='__name__', ctx=Load()), ops=[Eq()],"
-#" comparators=[Str(s='__main__')])";
-#  
-#  if ast.dump(node.test) is mainCheck:
-#    print '%s{"if":{"name":"%s","location":%s}},' % (
-#      indent, main, location(node))
+def handleAssign(node):
+  # Assign(expr* targets, expr value)
+  if node.targets and isinstance(node.targets[0], ast.Name):
+    nameNode = node.targets[0]
+    return {'type': 'assign', 'start': location(node), 'name': nameNode.id}
+  return None
+
+
+def handleIf(node):
+  # If(expr test, stmt* body, stmt* orelse)
+  #main = "__name__ == '__main__'"
+  mainCheck = "Compare(left=Name(id='__name__', ctx=Load()), ops=[Eq()], comparators=[Str(s='__main__')])" # pylint: disable=C0301
+  
+  if ast.dump(node.test) == mainCheck:
+    return {'type':'if', 'name':'__main__', 'start': location(node)}
+  return None
 
 
 def location(identifier):
-  return '{"lineno":%i,"col_offset":%i}' % (
-    identifier.lineno, identifier.col_offset)
+  return {"line": identifier.lineno, "col": identifier.col_offset}
   
   
 def process(filename):
   contents = file(filename).read()
-  module = ast.parse(contents, filename) #, '<string>', 'exec')  
+  module = ast.parse(contents, filename)  
   printModule(filename, module)
   
   
 def processStdin():  
   contents = sys.stdin.read()
-  module = ast.parse(contents, 'stdin') #, '<string>', 'exec')
+  module = ast.parse(contents, 'stdin')
   printModule('stdin', module)
   
   
