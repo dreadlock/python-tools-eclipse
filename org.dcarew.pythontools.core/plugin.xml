@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="pylintConfigurations" name="Pylint Configurations" schema="schema/pylintConfigurations.exsd"/>
 
    <extension
       point="org.eclipse.core.resources.natures"
@@ -67,4 +68,9 @@
       </breakpoint>
    </extension>
 
+   <extension point="org.dcarew.pythontools.core.pylintConfigurations">
+      <pylintrc name="Chromium" resource="pylintrc/chromium.pylintrc"/>
+      <pylintrc name="PEP 8" resource="pylintrc/pep8.pylintrc"/>
+   </extension>
+   
 </plugin>
