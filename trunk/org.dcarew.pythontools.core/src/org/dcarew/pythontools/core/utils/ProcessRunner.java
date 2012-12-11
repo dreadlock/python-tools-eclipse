@@ -1,7 +1,5 @@
 package org.dcarew.pythontools.core.utils;
 
-import org.dcarew.pythontools.core.PythonCorePlugin;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +7,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.List;
+
+import org.dcarew.pythontools.core.PythonCorePlugin;
 
 public class ProcessRunner {
   private ProcessBuilder builder;
@@ -50,6 +51,10 @@ public class ProcessRunner {
     } catch (InterruptedException e) {
       return 0;
     }
+  }
+
+  public List<String> getCommands() {
+    return builder.command();
   }
 
   public String getStdout() {

@@ -1,5 +1,14 @@
 package org.dcarew.pythontools.core.builder;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.dcarew.pythontools.core.PythonCorePlugin;
 import org.dcarew.pythontools.core.utils.ProcessRunner;
 import org.eclipse.core.resources.IFile;
@@ -11,14 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 class PylintJob extends WorkspaceJob {
   private List<IFile> files;
@@ -54,11 +55,47 @@ class PylintJob extends WorkspaceJob {
     return Status.OK_STATUS;
   }
 
+  private void createMarker(IFile file, String fileName, String lineStr, String errorType,
+      String message) {
+    // (C) convention, for programming standard violation
+    // (R) refactor, for bad code smell
+    // (W) warning, for python specific problems
+    // (E) error, for probable bugs in the code
+    // (F) fatal, if an error occurred which prevented pylint from doing further processing.
+
+    int line = 1;
+
+    try {
+      line = Integer.parseInt(lineStr);
+    } catch (NumberFormatException fne) {
+
+    }
+
+    String typeCode = errorType;
+
+    if (typeCode.indexOf(',') != -1) {
+      typeCode = typeCode.substring(0, typeCode.indexOf(','));
+    }
+
+    int severity = IMarker.SEVERITY_WARNING;
+
+    if (typeCode.startsWith("E") || typeCode.startsWith("F")) {
+      severity = IMarker.SEVERITY_ERROR;
+    }
+
+    MarkerUtils.createMarker(severity, file, line, typeCode + ": " + message, typeCode);
+  }
+
+  private File getCwd(IFile file) {
+    return file.getParent().getLocation().toFile();
+  }
+
   private void process(IFile file) {
     if (!file.exists()) {
       return;
     }
 
+    String pythonPath = PythonCorePlugin.getPlugin().getPythonPath();
     String pylintPath = PythonCorePlugin.getPlugin().getPylintPath();
 
     if (pylintPath == null) {
@@ -66,8 +103,17 @@ class PylintJob extends WorkspaceJob {
     } else {
       try {
         // TODO: use a pylintrc setting
-        ProcessRunner runner = new ProcessRunner(getCwd(file), pylintPath, "-f", "parseable", "-r",
-            "n", "-i", "y", "--indent-string=\"  \"", file.getName());
+        ProcessRunner runner;
+
+        if (pylintPath.endsWith(".py")) {
+          // TODO: PYTHONDONTWRITEBYTECODE=1
+          runner = new ProcessRunner(getCwd(file), pythonPath, pylintPath);
+        } else {
+          runner = new ProcessRunner(getCwd(file), pylintPath);
+        }
+
+        runner.getCommands().addAll(
+            Arrays.asList(new String[] {"-f", "parseable", "-r", "n", "-i", "y", file.getName()}));
 
         int exit = runner.execute();
 
@@ -103,41 +149,6 @@ class PylintJob extends WorkspaceJob {
 
       line = r.readLine();
     }
-  }
-
-  private void createMarker(IFile file, String fileName, String lineStr, String errorType,
-      String message) {
-    // (C) convention, for programming standard violation
-    // (R) refactor, for bad code smell
-    // (W) warning, for python specific problems
-    // (E) error, for probable bugs in the code
-    // (F) fatal, if an error occurred which prevented pylint from doing further processing.
-
-    int line = 1;
-
-    try {
-      line = Integer.parseInt(lineStr);
-    } catch (NumberFormatException fne) {
-
-    }
-
-    String typeCode = errorType;
-
-    if (typeCode.indexOf(',') != -1) {
-      typeCode = typeCode.substring(0, typeCode.indexOf(','));
-    }
-
-    int severity = IMarker.SEVERITY_WARNING;
-
-    if (typeCode.startsWith("E") || typeCode.startsWith("F")) {
-      severity = IMarker.SEVERITY_ERROR;
-    }
-
-    MarkerUtils.createMarker(severity, file, line, typeCode + ": " + message, typeCode);
-  }
-
-  private File getCwd(IFile file) {
-    return file.getParent().getLocation().toFile();
   }
 
 }

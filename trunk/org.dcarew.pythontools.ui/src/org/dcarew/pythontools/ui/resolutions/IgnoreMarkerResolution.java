@@ -18,6 +18,8 @@ import org.eclipse.ui.ide.IDE;
 
 // TODO: subclass WorkbenchMarkerResolution?
 
+// TODO: I0011: Locally disabling C0111
+
 class IgnoreMarkerResolution implements IMarkerResolution2 {
   private String code;
   private int line;
