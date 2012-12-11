@@ -6,12 +6,14 @@ public class PythonLocator {
 
   }
 
-  public String getDefaultPythonPath() {
-    return "python";
-  }
-
   public String getDefaultPylintPath() {
     return null;
+  }
+
+  public String getDefaultPythonPath() {
+    // TODO: on windows, look for python.exe on the PATH
+
+    return "python";
   }
 
 }
