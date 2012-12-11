@@ -35,8 +35,8 @@ def printModule(name, module):
 def handleClassDef(node):
   # identifier name, expr* bases, stmt* body, expr* decorator_list
   children = []
-  c = {'type': 'class', 'children': children, 'start': location(node),
-    'docs': docFor(node)}
+  c = {'type': 'class', 'name': node.name, 'children': children,
+       'start': location(node), 'docs': docFor(node)}
   
   for child in node.body:
     if isinstance(child, ast.FunctionDef):
