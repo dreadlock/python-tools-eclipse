@@ -13,6 +13,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
@@ -23,11 +24,16 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.osgi.framework.Version;
 
-// TODO: add a preference for the pylint configuration file
-
 public class PythonPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+  private static String getVersionText() {
+    Version version = PythonCorePlugin.getPlugin().getBundle().getVersion();
+
+    return version.getMajor() + "." + version.getMinor() + "." + version.getMicro();
+  }
+
   private Text pythonText;
   private Text pylintText;
+  private Combo combo;
 
   public PythonPreferencePage() {
     setDescription("Python Tools for Eclipse v" + getVersionText());
@@ -43,17 +49,10 @@ public class PythonPreferencePage extends PreferencePage implements IWorkbenchPr
     PythonCorePlugin.getPlugin().setPythonPath(pythonText.getText());
     PythonCorePlugin.getPlugin().setPylintPath(pylintText.getText());
 
+    IPylintConfig config = PylintConfigManager.getConfig(combo.getText());
+    PythonCorePlugin.getPlugin().setPylintConfig(config);
+
     return true;
-  }
-
-  @Override
-  protected void performDefaults() {
-    PythonLocator locator = new PythonLocator();
-
-    pythonText.setText(nonNull(locator.getDefaultPythonPath()));
-    pylintText.setText(nonNull(locator.getDefaultPylintPath()));
-
-    super.performDefaults();
   }
 
   @Override
@@ -97,15 +96,55 @@ public class PythonPreferencePage extends PreferencePage implements IWorkbenchPr
     GridDataFactory.swtDefaults().hint(widthHint, -1).applyTo(button);
     handleBrowseButton("Pylint", button, pylintText);
 
+    label = new Label(pylintGroup, SWT.NONE);
+    label.setText("Configuration:");
+
+    combo = new Combo(pylintGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
+    GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(combo);
+
     pythonText.setText(nonNull(PythonCorePlugin.getPlugin().getPythonPath()));
     pylintText.setText(nonNull(PythonCorePlugin.getPlugin().getPylintPath()));
 
-    // TODO:
+    combo.add("");
+
     for (IPylintConfig config : PylintConfigManager.getAllConfigs()) {
-      System.out.println(config);
+      combo.add(config.getName());
+    }
+
+    IPylintConfig config = PythonCorePlugin.getPlugin().getPylintConfig();
+
+    if (config != null) {
+      int index = combo.indexOf(config.getName());
+
+      if (index != -1) {
+        combo.select(index);
+      } else {
+        combo.select(0);
+      }
+    } else {
+      combo.select(0);
     }
 
     return composite;
+  }
+
+  @Override
+  protected void performDefaults() {
+    PythonLocator locator = new PythonLocator();
+
+    pythonText.setText(nonNull(locator.getDefaultPythonPath()));
+    pylintText.setText(nonNull(locator.getDefaultPylintPath()));
+
+    IPylintConfig defaultConfig = PylintConfigManager.getDefaultConfig();
+    if (defaultConfig != null) {
+      int index = combo.indexOf(defaultConfig.getName());
+
+      if (index != -1) {
+        combo.select(index);
+      }
+    }
+
+    super.performDefaults();
   }
 
   private void handleBrowseButton(final String scriptName, Button button, final Text text) {
@@ -125,12 +164,6 @@ public class PythonPreferencePage extends PreferencePage implements IWorkbenchPr
 
   private String nonNull(String str) {
     return (str == null ? "" : str);
-  }
-
-  private static String getVersionText() {
-    Version version = PythonCorePlugin.getPlugin().getBundle().getVersion();
-
-    return version.getMajor() + "." + version.getMinor() + "." + version.getMicro();
   }
 
 }

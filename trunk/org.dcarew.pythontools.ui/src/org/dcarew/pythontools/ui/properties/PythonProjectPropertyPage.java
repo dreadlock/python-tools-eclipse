@@ -1,5 +1,6 @@
 package org.dcarew.pythontools.ui.properties;
 
+import org.dcarew.pythontools.core.PythonCorePlugin;
 import org.dcarew.pythontools.core.pylint.IPylintConfig;
 import org.dcarew.pythontools.core.pylint.PylintConfigManager;
 import org.dcarew.pythontools.ui.PythonUIPlugin;
@@ -23,6 +24,13 @@ public class PythonProjectPropertyPage extends PropertyPage {
 
   public PythonProjectPropertyPage() {
     noDefaultAndApplyButton();
+  }
+
+  @Override
+  public boolean performOk() {
+    // TODO:
+
+    return true;
   }
 
   @SuppressWarnings("unused")
@@ -86,20 +94,13 @@ public class PythonProjectPropertyPage extends PropertyPage {
       combo.add(config.getName());
     }
 
-    IPylintConfig config = PylintConfigManager.getSelectedConfig();
+    IPylintConfig config = PythonCorePlugin.getPlugin().getPylintConfig();
 
     if (config != null) {
       combo.select(PylintConfigManager.getAllConfigs().indexOf(config));
     }
 
     return composite;
-  }
-
-  @Override
-  public boolean performOk() {
-    // TODO:
-
-    return true;
   }
 
 }

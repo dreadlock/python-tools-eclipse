@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dcarew.pythontools.core.PythonCorePlugin;
+import org.dcarew.pythontools.core.pylint.IPylintConfig;
 import org.dcarew.pythontools.core.utils.ProcessRunner;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -102,8 +103,9 @@ class PylintJob extends WorkspaceJob {
       MarkerUtils.clearMarkers(file);
     } else {
       try {
-        // TODO: use a pylintrc setting
         ProcessRunner runner;
+
+        IPylintConfig config = PythonCorePlugin.getPlugin().getPylintConfig(file.getProject());
 
         if (pylintPath.endsWith(".py")) {
           // TODO: PYTHONDONTWRITEBYTECODE=1
@@ -113,7 +115,14 @@ class PylintJob extends WorkspaceJob {
         }
 
         runner.getCommands().addAll(
-            Arrays.asList(new String[] {"-f", "parseable", "-r", "n", "-i", "y", file.getName()}));
+            Arrays.asList(new String[] {"-f", "parseable", "-r", "n", "-i", "y"}));
+
+        if (config != null) {
+          // TODO: spaces around the path name?
+          runner.getCommands().add("--rcfile=" + config.getFile().getAbsolutePath());
+        }
+
+        runner.getCommands().add(file.getName());
 
         int exit = runner.execute();
 

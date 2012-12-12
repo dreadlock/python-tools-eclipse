@@ -1,5 +1,11 @@
 [MASTER]
 
+# TODO: !!!
+# This file has been copied from the pep8 pylintrc, and needs to be
+# updated to the google style guidelines.
+# http://google-styleguide.googlecode.com/svn/trunk/pyguide.html
+# TODO: !!!
+
 # Specify a configuration file.
 #rcfile=
 
