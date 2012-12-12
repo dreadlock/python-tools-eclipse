@@ -8,9 +8,10 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextUtilities;
 
 class PythonAutoIndentStrategy extends DefaultIndentLineAutoEditStrategy {
+  private PythonEditor editor;
 
-  public PythonAutoIndentStrategy() {
-
+  public PythonAutoIndentStrategy(PythonEditor editor) {
+    this.editor = editor;
   }
 
   @Override
@@ -45,8 +46,7 @@ class PythonAutoIndentStrategy extends DefaultIndentLineAutoEditStrategy {
       }
 
       if (endsInColon) {
-        // TODO: we need to be able to configure this
-        buf.append("  ");
+        buf.append(editor.getIndent());
       }
 
       command.text = buf.toString();

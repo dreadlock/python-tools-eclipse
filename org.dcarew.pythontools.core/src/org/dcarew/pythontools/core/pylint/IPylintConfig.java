@@ -5,11 +5,13 @@ import java.io.IOException;
 
 public interface IPylintConfig {
 
-  public String getName();
+  public byte[] getContents() throws IOException;
 
   public File getFile();
 
-  public byte[] getContents() throws IOException;
+  public String getIndent();
+
+  public String getName();
 
   public boolean isModifyable();
 

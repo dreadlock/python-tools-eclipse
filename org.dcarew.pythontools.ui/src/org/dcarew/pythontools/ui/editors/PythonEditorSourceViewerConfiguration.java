@@ -29,22 +29,19 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
   }
 
   @Override
-  public IReconciler getReconciler(ISourceViewer sourceViewer) {
-    if (reconciler == null && sourceViewer != null) {
-      reconciler = new MonoReconciler(new PythonEditorReconcilingStrategy(editor), false);
-      reconciler.setDelay(500);
-    }
-
-    return reconciler;
-  }
-
-  @Override
   public IAutoEditStrategy[] getAutoEditStrategies(ISourceViewer sourceViewer, String contentType) {
     if (IDocument.DEFAULT_CONTENT_TYPE.equals(contentType)) {
-      return new IAutoEditStrategy[] {new PythonAutoIndentStrategy()};
+      return new IAutoEditStrategy[] {new PythonAutoIndentStrategy(editor)};
     } else {
       return super.getAutoEditStrategies(sourceViewer, contentType);
     }
+  }
+
+  @Override
+  public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
+    return new String[] {
+        IDocument.DEFAULT_CONTENT_TYPE, PythonPartitionScanner.PYTHON_COMMENT,
+        PythonPartitionScanner.PYTHON_STRING};
   }
 
   @Override
@@ -64,13 +61,6 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
 //  }
 
   @Override
-  public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-    return new String[] {
-        IDocument.DEFAULT_CONTENT_TYPE, PythonPartitionScanner.PYTHON_COMMENT,
-        PythonPartitionScanner.PYTHON_STRING};
-  }
-
-  @Override
   public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
     PresentationReconciler reconciler = new PresentationReconciler();
 
@@ -86,6 +76,16 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
     dr = new DefaultDamagerRepairer(getStringScanner());
     reconciler.setDamager(dr, PythonPartitionScanner.PYTHON_STRING);
     reconciler.setRepairer(dr, PythonPartitionScanner.PYTHON_STRING);
+
+    return reconciler;
+  }
+
+  @Override
+  public IReconciler getReconciler(ISourceViewer sourceViewer) {
+    if (reconciler == null && sourceViewer != null) {
+      reconciler = new MonoReconciler(new PythonEditorReconcilingStrategy(editor), false);
+      reconciler.setDelay(500);
+    }
 
     return reconciler;
   }

@@ -69,8 +69,9 @@
    </extension>
 
    <extension point="org.dcarew.pythontools.core.pylintConfigurations">
-      <pylintrc name="Chromium" resource="pylintrc/chromium.pylintrc"/>
-      <pylintrc name="PEP 8" resource="pylintrc/pep8.pylintrc"/>
+      <pylintrc name="Chromium Style Guide" resource="pylintrc/chromium.pylintrc"/>
+      <pylintrc name="Google Style Guide" resource="pylintrc/google.pylintrc"/>
+      <pylintrc name="PEP 8 Style" resource="pylintrc/pep8.pylintrc"/>
    </extension>
    
 </plugin>

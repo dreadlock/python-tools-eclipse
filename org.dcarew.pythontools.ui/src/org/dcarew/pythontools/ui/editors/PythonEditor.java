@@ -1,10 +1,13 @@
 package org.dcarew.pythontools.ui.editors;
 
+import org.dcarew.pythontools.core.PythonCorePlugin;
 import org.dcarew.pythontools.core.parser.PyModule;
 import org.dcarew.pythontools.core.parser.PyNode;
 import org.dcarew.pythontools.core.parser.PythonParser;
+import org.dcarew.pythontools.core.pylint.IPylintConfig;
 import org.dcarew.pythontools.ui.PythonUIPlugin;
 import org.dcarew.pythontools.ui.preferences.PreferenceConstants;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -24,132 +27,7 @@ import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 public class PythonEditor extends TextEditor {
-  private PythonEditorOutlinePage outlinePage;
-  private EditorImageUpdater imageUpdater;
-  private PyModule model;
-
-  private BracketInserter bracketInserter = new BracketInserter(this);
-
-  public PythonEditor() {
-    setPreferenceStore(PythonUIPlugin.getPlugin().getCombinedPreferenceStore());
-
-    setSourceViewerConfiguration(new PythonEditorSourceViewerConfiguration(this,
-        getPreferenceStore()));
-
-    setRulerContextMenuId("#PythonEditorRulerContext");
-
-    setDocumentProvider(new PythonDocumentProvider());
-
-    // TODO: key binding scopes
-    //setKeyBindingScopes(new String[] {"com.googlecode.goclipse.editor"});
-  }
-
-  @SuppressWarnings("rawtypes")
-  @Override
-  public Object getAdapter(Class required) {
-    if (IContentOutlinePage.class.equals(required)) {
-      if (outlinePage == null) {
-        outlinePage = new PythonEditorOutlinePage(this);
-      }
-
-      return outlinePage;
-    }
-
-    return super.getAdapter(required);
-  }
-
-  @Override
-  protected final void doSetInput(IEditorInput input) throws CoreException {
-    super.doSetInput(input);
-
-    if (input instanceof IFileEditorInput) {
-      imageUpdater = new EditorImageUpdater(this);
-    }
-  }
-
-  @Override
-  public void createPartControl(Composite parent) {
-    super.createPartControl(parent);
-
-    ISourceViewer sourceViewer = getSourceViewer();
-
-    if (sourceViewer instanceof ITextViewerExtension) {
-      ((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(bracketInserter);
-    }
-
-    getDocument().addDocumentListener(new IDocumentListener() {
-      @Override
-      public void documentAboutToBeChanged(DocumentEvent event) {
-
-      }
-
-      @Override
-      public void documentChanged(DocumentEvent event) {
-        handleDocumentModified();
-      }
-    });
-  }
-
-  @Override
-  public void dispose() {
-    if (imageUpdater != null) {
-      imageUpdater.dispose();
-    }
-
-    ISourceViewer sourceViewer = getSourceViewer();
-
-    if (sourceViewer instanceof ITextViewerExtension) {
-      ((ITextViewerExtension) sourceViewer).removeVerifyKeyListener(bracketInserter);
-    }
-
-    super.dispose();
-  }
-
-  @Override
-  protected void configureSourceViewerDecorationSupport(SourceViewerDecorationSupport support) {
-    ICharacterPairMatcher matcher = new DefaultCharacterPairMatcher(
-        new char[] {'(', ')', '[', ']'}, IDocumentExtension3.DEFAULT_PARTITIONING);
-    support.setCharacterPairMatcher(matcher);
-    support.setMatchingCharacterPainterPreferenceKeys(PreferenceConstants.EDITOR_MATCHING_BRACKETS,
-        PreferenceConstants.EDITOR_MATCHING_BRACKETS_COLOR);
-
-    super.configureSourceViewerDecorationSupport(support);
-  }
-
-  @Override
-  protected void setTitleImage(Image image) {
-    super.setTitleImage(image);
-  }
-
-  protected String getText() {
-    return getSourceViewer().getDocument().get();
-  }
-
-  protected void handleReconcilation(IRegion partition) {
-    if (outlinePage != null) {
-      outlinePage.handleEditorReconcilation();
-    }
-  }
-
-  public IDocument getDocument() {
-    return getSourceViewer().getDocument();
-  }
-
-  protected PyModule getModel() {
-    if (model == null) {
-      model = new PythonParser(getText()).parse();
-    }
-
-    return model;
-  }
-
-  protected void handleDocumentModified() {
-    model = null;
-  }
-
-  ISourceViewer getISourceViewer() {
-    return getSourceViewer();
-  }
+  public static final String DEFAULT_INDENT = "  ";
 
   static char getEscapeCharacter(char character) {
     switch (character) {
@@ -192,12 +70,161 @@ public class PythonEditor extends TextEditor {
     }
   }
 
+  private PythonEditorOutlinePage outlinePage;
+
+  private EditorImageUpdater imageUpdater;
+
+  private PyModule model;
+
+  private BracketInserter bracketInserter = new BracketInserter(this);
+
+  public PythonEditor() {
+    setPreferenceStore(PythonUIPlugin.getPlugin().getCombinedPreferenceStore());
+
+    setSourceViewerConfiguration(new PythonEditorSourceViewerConfiguration(this,
+        getPreferenceStore()));
+
+    setRulerContextMenuId("#PythonEditorRulerContext");
+
+    setDocumentProvider(new PythonDocumentProvider());
+
+    // TODO: key binding scopes
+    //setKeyBindingScopes(new String[] {"com.googlecode.goclipse.editor"});
+  }
+
+  @Override
+  public void createPartControl(Composite parent) {
+    super.createPartControl(parent);
+
+    ISourceViewer sourceViewer = getSourceViewer();
+
+    if (sourceViewer instanceof ITextViewerExtension) {
+      ((ITextViewerExtension) sourceViewer).prependVerifyKeyListener(bracketInserter);
+    }
+
+    getDocument().addDocumentListener(new IDocumentListener() {
+      @Override
+      public void documentAboutToBeChanged(DocumentEvent event) {
+
+      }
+
+      @Override
+      public void documentChanged(DocumentEvent event) {
+        handleDocumentModified();
+      }
+    });
+  }
+
+  @Override
+  public void dispose() {
+    if (imageUpdater != null) {
+      imageUpdater.dispose();
+    }
+
+    ISourceViewer sourceViewer = getSourceViewer();
+
+    if (sourceViewer instanceof ITextViewerExtension) {
+      ((ITextViewerExtension) sourceViewer).removeVerifyKeyListener(bracketInserter);
+    }
+
+    super.dispose();
+  }
+
+  @SuppressWarnings("rawtypes")
+  @Override
+  public Object getAdapter(Class required) {
+    if (IContentOutlinePage.class.equals(required)) {
+      if (outlinePage == null) {
+        outlinePage = new PythonEditorOutlinePage(this);
+      }
+
+      return outlinePage;
+    }
+
+    return super.getAdapter(required);
+  }
+
+  public IDocument getDocument() {
+    return getSourceViewer().getDocument();
+  }
+
+  public String getIndent() {
+    IEditorInput input = getEditorInput();
+
+    if (input instanceof IFileEditorInput) {
+      IFile file = ((IFileEditorInput) input).getFile();
+
+      IPylintConfig config = PythonCorePlugin.getPlugin().getPylintConfig(file.getProject());
+
+      if (config != null) {
+        String indent = config.getIndent();
+
+        if (indent != null) {
+          return indent;
+        }
+      }
+    }
+
+    return DEFAULT_INDENT;
+  }
+
   public void selectAndReveal(PyNode node) {
     if (node.getOffset() != -1) {
       int length = node.getName() == null ? 0 : node.getName().length();
 
       selectAndReveal(node.getOffset(), length);
     }
+  }
+
+  @Override
+  protected void configureSourceViewerDecorationSupport(SourceViewerDecorationSupport support) {
+    ICharacterPairMatcher matcher = new DefaultCharacterPairMatcher(
+        new char[] {'(', ')', '[', ']'}, IDocumentExtension3.DEFAULT_PARTITIONING);
+    support.setCharacterPairMatcher(matcher);
+    support.setMatchingCharacterPainterPreferenceKeys(PreferenceConstants.EDITOR_MATCHING_BRACKETS,
+        PreferenceConstants.EDITOR_MATCHING_BRACKETS_COLOR);
+
+    super.configureSourceViewerDecorationSupport(support);
+  }
+
+  @Override
+  protected final void doSetInput(IEditorInput input) throws CoreException {
+    super.doSetInput(input);
+
+    if (input instanceof IFileEditorInput) {
+      imageUpdater = new EditorImageUpdater(this);
+    }
+  }
+
+  protected PyModule getModel() {
+    if (model == null) {
+      model = new PythonParser(getText()).parse();
+    }
+
+    return model;
+  }
+
+  protected String getText() {
+    return getSourceViewer().getDocument().get();
+  }
+
+  protected void handleDocumentModified() {
+    model = null;
+  }
+
+  protected void handleReconcilation(IRegion partition) {
+    if (outlinePage != null) {
+      outlinePage.handleEditorReconcilation();
+    }
+  }
+
+  @Override
+  protected void setTitleImage(Image image) {
+    super.setTitleImage(image);
+  }
+
+  ISourceViewer getISourceViewer() {
+    return getSourceViewer();
   }
 
 }

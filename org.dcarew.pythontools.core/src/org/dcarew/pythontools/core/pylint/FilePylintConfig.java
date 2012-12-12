@@ -1,21 +1,25 @@
 package org.dcarew.pythontools.core.pylint;
 
-import org.dcarew.pythontools.core.utils.IOUtils;
-import org.eclipse.core.resources.IFile;
-
 import java.io.File;
 import java.io.IOException;
 
+import org.dcarew.pythontools.core.utils.IOUtils;
+import org.eclipse.core.resources.IFile;
+
 public class FilePylintConfig implements IPylintConfig {
   private IFile file;
+
+  private String indent;
+
+  private boolean indentInited;
 
   public FilePylintConfig(IFile file) {
     this.file = file;
   }
 
   @Override
-  public String getName() {
-    return file.getName();
+  public byte[] getContents() throws IOException {
+    return IOUtils.getContentsAsBytes(file);
   }
 
   @Override
@@ -24,8 +28,23 @@ public class FilePylintConfig implements IPylintConfig {
   }
 
   @Override
-  public byte[] getContents() throws IOException {
-    return IOUtils.getContentsAsBytes(file);
+  public String getIndent() {
+    if (!indentInited) {
+      indentInited = true;
+
+      try {
+        indent = Utils.parseIdent(getContents());
+      } catch (IOException e) {
+
+      }
+    }
+
+    return indent;
+  }
+
+  @Override
+  public String getName() {
+    return file.getName();
   }
 
   @Override
