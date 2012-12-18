@@ -139,7 +139,7 @@ public class PythonProjectPropertyPage extends PropertyPage implements Selection
   }
 
   protected IProject getProject() {
-    return (IProject) getElement();
+    return (IProject) getElement().getAdapter(IProject.class);
   }
 
   private void updateControlStates() {
