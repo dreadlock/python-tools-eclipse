@@ -1,5 +1,6 @@
 package org.dcarew.pythontools.core;
 
+import org.dcarew.pythontools.core.builder.PythonNature;
 import org.dcarew.pythontools.core.builder.PythonResourceChangeBuilder;
 import org.dcarew.pythontools.core.pylint.IPylintConfig;
 import org.dcarew.pythontools.core.pylint.PylintConfigManager;
@@ -7,11 +8,14 @@ import org.dcarew.pythontools.core.utils.PythonLocator;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.prefs.BackingStoreException;
@@ -24,7 +28,7 @@ public class PythonCorePlugin extends Plugin {
 
   public static final String MARKER_ID = "org.dcarew.pythontools.core.pythonMarker";
 
-  private static final String PYLINT_CONFIG_PREF = "pylintConfigPref";
+  public static final String PYLINT_CONFIG_PREF = "pylintConfigPref";
 
   // The shared instance
   private static PythonCorePlugin plugin;
@@ -53,12 +57,50 @@ public class PythonCorePlugin extends Plugin {
 
   private IEclipsePreferences prefs;
 
+  public void applyProjectSettings(IProject project, boolean analyzeProject,
+      boolean overrideWorkspaceSettings, IPylintConfig config) throws CoreException {
+    IEclipsePreferences projPrefs = getProjectPreferences(project);
+
+    boolean changed = setPref(projPrefs, "override", overrideWorkspaceSettings);
+
+    changed |= setPref(projPrefs, PYLINT_CONFIG_PREF, config == null ? "" : config.getName());
+
+    if (PythonNature.isPythonProject(project)) {
+      changed |= setPref(projPrefs, "analysisDisabled", analyzeProject);
+    } else {
+      if (analyzeProject && !PythonNature.hasPythonBuilder(project)) {
+        PythonNature.addBuilderToProject(project);
+
+        // adding the builder will rebuild the project
+        changed = false;
+      } else if (!analyzeProject && PythonNature.hasPythonBuilder(project)) {
+        PythonNature.removeBuilderFromProject(project);
+
+        changed = true;
+      }
+    }
+
+    try {
+      projPrefs.flush();
+    } catch (BackingStoreException e) {
+
+    }
+
+    // TODO: if changed, re-build the project
+
+  }
+
   public IEclipsePreferences getPreferences() {
     if (prefs == null) {
       prefs = InstanceScope.INSTANCE.getNode(PLUGIN_ID);
     }
 
     return prefs;
+  }
+
+  public IEclipsePreferences getProjectPreferences(IProject project) {
+    IScopeContext projectScope = new ProjectScope(project);
+    return projectScope.getNode(PLUGIN_ID);
   }
 
   public IPylintConfig getPylintConfig() {
@@ -72,7 +114,10 @@ public class PythonCorePlugin extends Plugin {
   }
 
   public IPylintConfig getPylintConfig(IProject project) {
-    // TODO:
+    if (isProjectOverride(project)) {
+      return PylintConfigManager.getConfig(getProjectPreferences(project).get(PYLINT_CONFIG_PREF,
+          ""));
+    }
 
     return getPylintConfig();
   }
@@ -97,9 +142,19 @@ public class PythonCorePlugin extends Plugin {
     }
   }
 
-  public void setPylintConfig(IProject project, IPylintConfig pylintConfig) {
-    // TODO:
+  public boolean isAnalysisEnabled(IProject project) {
+    if (PythonNature.isPythonProject(project)) {
+      IScopeContext projectScope = new ProjectScope(project);
+      IEclipsePreferences projectNode = projectScope.getNode(PLUGIN_ID);
 
+      return !projectNode.getBoolean("analysisDisabled", false);
+    } else {
+      return PythonNature.hasPythonBuilder(project);
+    }
+  }
+
+  public boolean isProjectOverride(IProject project) {
+    return getProjectPreferences(project).getBoolean("override", false);
   }
 
   public void setPylintConfig(IPylintConfig pylintConfig) {
@@ -180,6 +235,24 @@ public class PythonCorePlugin extends Plugin {
     } catch (BackingStoreException e) {
 
     }
+  }
+
+  private boolean setPref(IEclipsePreferences prefs, String key, final boolean value) {
+    if (value != prefs.getBoolean(key, false)) {
+      prefs.putBoolean(key, value);
+      return true;
+    }
+
+    return false;
+  }
+
+  private boolean setPref(IEclipsePreferences prefs, String key, final String value) {
+    if (value != prefs.get(key, null)) {
+      prefs.put(key, value);
+      return true;
+    }
+
+    return false;
   }
 
 }

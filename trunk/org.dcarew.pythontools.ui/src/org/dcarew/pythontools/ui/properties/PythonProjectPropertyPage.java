@@ -4,12 +4,15 @@ import org.dcarew.pythontools.core.PythonCorePlugin;
 import org.dcarew.pythontools.core.pylint.IPylintConfig;
 import org.dcarew.pythontools.core.pylint.PylintConfigManager;
 import org.dcarew.pythontools.ui.PythonUIPlugin;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -20,7 +23,10 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.dialogs.PropertyPage;
 
-public class PythonProjectPropertyPage extends PropertyPage {
+public class PythonProjectPropertyPage extends PropertyPage implements SelectionListener {
+  private Button analyzeProjectButton;
+  private Button overrideButton;
+  private Combo combo;
 
   public PythonProjectPropertyPage() {
     noDefaultAndApplyButton();
@@ -28,39 +34,51 @@ public class PythonProjectPropertyPage extends PropertyPage {
 
   @Override
   public boolean performOk() {
-    // TODO:
+    IProject project = getProject();
+    IPylintConfig config = PylintConfigManager.getConfig(combo.getText());
+
+    try {
+      PythonCorePlugin.getPlugin().applyProjectSettings(project,
+          analyzeProjectButton.getSelection(), overrideButton.getSelection(), config);
+    } catch (CoreException e) {
+
+    }
 
     return true;
   }
 
-  @SuppressWarnings("unused")
+  @Override
+  public void widgetDefaultSelected(SelectionEvent e) {
+
+  }
+
+  @Override
+  public void widgetSelected(SelectionEvent e) {
+    updateControlStates();
+  }
+
   @Override
   protected Control createContents(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
     GridLayoutFactory.fillDefaults().applyTo(composite);
-
-    // TODO: finish this page
-    if (true) {
-      return composite;
-    }
 
     Group group = new Group(composite, SWT.NONE);
     group.setText("Enable Pylint");
     GridLayoutFactory.swtDefaults().extendedMargins(0, 0, 0, 3).applyTo(group);
     GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.FILL).applyTo(group);
 
-    // TODO: hook this up
-    Button analyzeProjectButton = new Button(group, SWT.CHECK);
+    analyzeProjectButton = new Button(group, SWT.CHECK);
     analyzeProjectButton.setText("Analyze this project with Pylint");
+    analyzeProjectButton.addSelectionListener(this);
 
     group = new Group(composite, SWT.NONE);
     group.setText("Pylint settings");
     GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
     GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.FILL).applyTo(group);
 
-    // TODO: hook this up
-    Button overrideButton = new Button(group, SWT.CHECK);
+    overrideButton = new Button(group, SWT.CHECK);
     overrideButton.setText("Enable project specific settings");
+    overrideButton.addSelectionListener(this);
 
     Link link = new Link(group, SWT.NONE);
     link.setText("<a>Configure Workspace Settings...</a>");
@@ -84,23 +102,49 @@ public class PythonProjectPropertyPage extends PropertyPage {
     GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.FILL).applyTo(subComposite);
 
     Label label = new Label(subComposite, SWT.NONE);
-    label.setText("Pylint configuration:");
+    label.setText("Configuration:");
     GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-    Combo combo = new Combo(subComposite, SWT.DROP_DOWN);
+    combo = new Combo(subComposite, SWT.DROP_DOWN);
     GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(combo);
 
     for (IPylintConfig config : PylintConfigManager.getAllConfigs()) {
       combo.add(config.getName());
     }
 
-    IPylintConfig config = PythonCorePlugin.getPlugin().getPylintConfig();
+    IProject project = getProject();
 
-    if (config != null) {
-      combo.select(PylintConfigManager.getAllConfigs().indexOf(config));
+    analyzeProjectButton.setSelection(PythonCorePlugin.getPlugin().isAnalysisEnabled(project));
+    overrideButton.setSelection(PythonCorePlugin.getPlugin().isProjectOverride(project));
+
+    String configName = PythonCorePlugin.getPlugin().getProjectPreferences(project).get(
+        PythonCorePlugin.PYLINT_CONFIG_PREF, null);
+    IPylintConfig config = PylintConfigManager.getConfig(configName);
+
+    if (config == null) {
+      config = PythonCorePlugin.getPlugin().getPylintConfig();
     }
 
+    if (config != null) {
+      int index = combo.indexOf(config.getName());
+
+      if (index != -1) {
+        combo.select(index);
+      }
+    }
+
+    updateControlStates();
+
     return composite;
+  }
+
+  protected IProject getProject() {
+    return (IProject) getElement();
+  }
+
+  private void updateControlStates() {
+    overrideButton.setEnabled(analyzeProjectButton.getSelection());
+    combo.setEnabled(analyzeProjectButton.getSelection() && overrideButton.getSelection());
   }
 
 }
