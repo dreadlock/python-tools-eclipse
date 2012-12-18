@@ -1,21 +1,27 @@
 package org.dcarew.pythontools.core.builder;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 public class PythonNature implements IProjectNature {
   public static final String NATURE_ID = "org.dcarew.pythontools.core.pythonNature";
 
-  private IProject project;
+  public static void addBuilderToProject(IProject project) throws CoreException {
+    if (!hasPythonBuilder(project)) {
+      PythonNature nature = new PythonNature();
+      nature.setProject(project);
+      nature.configure();
+    }
+  }
 
-  public static void addToProject(IProject project) throws CoreException {
+  public static void addNatureToProject(IProject project) throws CoreException {
     IProjectDescription description = project.getDescription();
 
     Set<String> natures = new HashSet<String>(Arrays.asList(description.getNatureIds()));
@@ -27,6 +33,43 @@ public class PythonNature implements IProjectNature {
     project.setDescription(description, null);
   }
 
+  public static boolean hasPythonBuilder(IProject project) {
+    try {
+      IProjectDescription desc = project.getDescription();
+      ICommand[] commands = desc.getBuildSpec();
+
+      for (int i = 0; i < commands.length; ++i) {
+        if (commands[i].getBuilderName().equals(PythonBuilder.BUILDER_ID)) {
+          return true;
+        }
+      }
+    } catch (CoreException ce) {
+
+    }
+
+    return false;
+  }
+
+  public static boolean isPythonProject(IProject project) {
+    try {
+      IProjectDescription description = project.getDescription();
+
+      return Arrays.asList(description.getNatureIds()).contains(NATURE_ID);
+    } catch (CoreException ce) {
+      return false;
+    }
+  }
+
+  public static void removeBuilderFromProject(IProject project) throws CoreException {
+    if (!hasPythonBuilder(project)) {
+      PythonNature nature = new PythonNature();
+      nature.setProject(project);
+      nature.deconfigure();
+    }
+  }
+
+  private IProject project;
+
   public PythonNature() {
 
   }
@@ -36,10 +79,8 @@ public class PythonNature implements IProjectNature {
     IProjectDescription desc = project.getDescription();
     ICommand[] commands = desc.getBuildSpec();
 
-    for (int i = 0; i < commands.length; ++i) {
-      if (commands[i].getBuilderName().equals(PythonBuilder.BUILDER_ID)) {
-        return;
-      }
+    if (hasPythonBuilder(project)) {
+      return;
     }
 
     ICommand[] newCommands = new ICommand[commands.length + 1];

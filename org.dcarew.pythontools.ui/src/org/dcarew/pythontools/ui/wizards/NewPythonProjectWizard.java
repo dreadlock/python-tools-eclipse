@@ -28,7 +28,7 @@ public class NewPythonProjectWizard extends BasicNewProjectResourceWizard {
   public boolean performFinish() {
     if (super.performFinish()) {
       try {
-        PythonNature.addToProject(getNewProject());
+        PythonNature.addNatureToProject(getNewProject());
       } catch (CoreException e) {
         PythonUIPlugin.logError(e);
       }
