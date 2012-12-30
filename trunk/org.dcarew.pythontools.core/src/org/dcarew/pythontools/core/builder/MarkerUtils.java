@@ -1,15 +1,29 @@
 package org.dcarew.pythontools.core.builder;
 
 import org.dcarew.pythontools.core.PythonCorePlugin;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 public class MarkerUtils {
   private static final String ERROR_CODE = "errorCode";
 
-  private MarkerUtils() {
+  public static void clearMarkers(IContainer container) {
+    try {
+      container.deleteMarkers(PythonCorePlugin.MARKER_ID, true, IResource.DEPTH_INFINITE);
+    } catch (CoreException e) {
 
+    }
+  }
+
+  public static void clearMarkers(IFile file) {
+    try {
+      file.deleteMarkers(PythonCorePlugin.MARKER_ID, true, 0);
+    } catch (CoreException e) {
+
+    }
   }
 
   public static void createMarker(int severity, IFile file, int line, String message) {
@@ -31,16 +45,12 @@ public class MarkerUtils {
     }
   }
 
-  public static void clearMarkers(IFile file) {
-    try {
-      file.deleteMarkers(PythonCorePlugin.MARKER_ID, true, 0);
-    } catch (CoreException e) {
-
-    }
-  }
-
   public static String getErrorCode(IMarker marker) {
     return marker.getAttribute(ERROR_CODE, null);
+  }
+
+  private MarkerUtils() {
+
   }
 
 }
