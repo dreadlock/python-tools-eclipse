@@ -23,75 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 class PylintJob extends WorkspaceJob {
-  private List<IFile> files;
-
-  public PylintJob(IProject project, List<IFile> files) {
-    super("Pylint");
-
-    this.files = files;
-
-    // TODO: only for the given project?
-    //setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
-    setRule(ResourcesPlugin.getWorkspace().getRuleFactory().markerRule(project));
-  }
-
-  @Override
-  public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-    monitor.beginTask("Running pylint...", files.size() * 9 + 1);
-
-    monitor.worked(1);
-
-    try {
-      for (IFile file : files) {
-        process(file);
-
-        monitor.worked(9);
-      }
-    } catch (Throwable t) {
-      PythonCorePlugin.logError(t);
-    } finally {
-      monitor.done();
-    }
-
-    return Status.OK_STATUS;
-  }
-
-  private void createMarker(IFile file, String fileName, String lineStr, String errorType,
-      String message) {
-    // (C) convention, for programming standard violation
-    // (R) refactor, for bad code smell
-    // (W) warning, for python specific problems
-    // (E) error, for probable bugs in the code
-    // (F) fatal, if an error occurred which prevented pylint from doing further processing.
-
-    int line = 1;
-
-    try {
-      line = Integer.parseInt(lineStr);
-    } catch (NumberFormatException fne) {
-
-    }
-
-    String typeCode = errorType;
-
-    if (typeCode.indexOf(',') != -1) {
-      typeCode = typeCode.substring(0, typeCode.indexOf(','));
-    }
-
-    int severity = IMarker.SEVERITY_WARNING;
-
-    if (typeCode.startsWith("E") || typeCode.startsWith("F")) {
-      severity = IMarker.SEVERITY_ERROR;
-    }
-
-    MarkerUtils.createMarker(severity, file, line, typeCode + ": " + message, typeCode);
-  }
-
-  private File getCwd(IFile file) {
-    return file.getParent().getLocation().toFile();
-  }
-
-  private void process(IFile file) {
+  static void process(IFile file) {
     if (!file.exists()) {
       return;
     }
@@ -137,7 +69,42 @@ class PylintJob extends WorkspaceJob {
     }
   }
 
-  private void processOutput(IFile file, String str) throws IOException {
+  private static void createMarker(IFile file, String fileName, String lineStr, String errorType,
+      String message) {
+    // (C) convention, for programming standard violation
+    // (R) refactor, for bad code smell
+    // (W) warning, for python specific problems
+    // (E) error, for probable bugs in the code
+    // (F) fatal, if an error occurred which prevented pylint from doing further processing.
+
+    int line = 1;
+
+    try {
+      line = Integer.parseInt(lineStr);
+    } catch (NumberFormatException fne) {
+
+    }
+
+    String typeCode = errorType;
+
+    if (typeCode.indexOf(',') != -1) {
+      typeCode = typeCode.substring(0, typeCode.indexOf(','));
+    }
+
+    int severity = IMarker.SEVERITY_WARNING;
+
+    if (typeCode.startsWith("E") || typeCode.startsWith("F")) {
+      severity = IMarker.SEVERITY_ERROR;
+    }
+
+    MarkerUtils.createMarker(severity, file, line, typeCode + ": " + message, typeCode);
+  }
+
+  private static File getCwd(IFile file) {
+    return file.getParent().getLocation().toFile();
+  }
+
+  private static void processOutput(IFile file, String str) throws IOException {
     // build.py:757: [C] Line too long (85/80)
     // build.py:1: [C] Too many lines in module (1063)
 
@@ -158,6 +125,39 @@ class PylintJob extends WorkspaceJob {
 
       line = r.readLine();
     }
+  }
+
+  private List<IFile> files;
+
+  public PylintJob(IProject project, List<IFile> files) {
+    super("Pylint");
+
+    this.files = files;
+
+    // TODO: only for the given project?
+    //setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
+    setRule(ResourcesPlugin.getWorkspace().getRuleFactory().markerRule(project));
+  }
+
+  @Override
+  public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+    monitor.beginTask("Running pylint...", files.size() * 9 + 1);
+
+    monitor.worked(1);
+
+    try {
+      for (IFile file : files) {
+        process(file);
+
+        monitor.worked(9);
+      }
+    } catch (Throwable t) {
+      PythonCorePlugin.logError(t);
+    } finally {
+      monitor.done();
+    }
+
+    return Status.OK_STATUS;
   }
 
 }

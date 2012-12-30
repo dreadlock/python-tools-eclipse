@@ -1,19 +1,18 @@
 package org.dcarew.pythontools.core;
 
+import org.dcarew.pythontools.core.builder.CleanProjectJob;
 import org.dcarew.pythontools.core.builder.PythonNature;
-import org.dcarew.pythontools.core.builder.PythonResourceChangeBuilder;
 import org.dcarew.pythontools.core.pylint.IPylintConfig;
 import org.dcarew.pythontools.core.pylint.PylintConfigManager;
 import org.dcarew.pythontools.core.utils.PythonLocator;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ProjectScope;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -86,8 +85,11 @@ public class PythonCorePlugin extends Plugin {
 
     }
 
-    // TODO: if changed, re-build the project
-
+    // if changed, re-build the project
+    if (changed) {
+      Job job = new CleanProjectJob(project);
+      job.schedule();
+    }
   }
 
   public IEclipsePreferences getPreferences() {
@@ -203,15 +205,15 @@ public class PythonCorePlugin extends Plugin {
       initPython();
     }
 
-    // This is really not awesomely stable.
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(
-        PythonResourceChangeBuilder.getBuilder(), IResourceChangeEvent.POST_CHANGE); // PRE_BUILD
+//    // This is really not awesomely stable.
+//    ResourcesPlugin.getWorkspace().addResourceChangeListener(
+//        PythonResourceChangeBuilder.getBuilder(), IResourceChangeEvent.POST_CHANGE); // PRE_BUILD
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
-    ResourcesPlugin.getWorkspace().removeResourceChangeListener(
-        PythonResourceChangeBuilder.getBuilder());
+//    ResourcesPlugin.getWorkspace().removeResourceChangeListener(
+//        PythonResourceChangeBuilder.getBuilder());
 
     plugin = null;
 

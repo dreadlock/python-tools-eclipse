@@ -6,6 +6,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.reconciler.IReconciler;
@@ -14,6 +15,7 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
+import org.eclipse.ui.texteditor.HippieProposalProcessor;
 
 public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfiguration {
   private PythonEditor editor;
@@ -48,10 +50,21 @@ public class PythonEditorSourceViewerConfiguration extends TextSourceViewerConfi
   public IContentAssistant getContentAssistant(ISourceViewer sourceViewer) {
     ContentAssistant assistant = new ContentAssistant();
 
-    assistant.setContentAssistProcessor(new PythonContentAssistProcessor(),
+    // TODO: have the PythonContentAssistProcessor use info from the hippie
+    // completer. Only use suggestions from .py files.
+    assistant.setContentAssistProcessor(new HippieProposalProcessor(),
         IDocument.DEFAULT_CONTENT_TYPE);
 
     return assistant;
+  }
+
+  @Override
+  public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
+    if (sourceViewer == null) {
+      return null;
+    }
+
+    return new IHyperlinkDetector[] {new PythonHyperlinkDetector(editor)};
   }
 
   // TODO: set the indent from the current style
