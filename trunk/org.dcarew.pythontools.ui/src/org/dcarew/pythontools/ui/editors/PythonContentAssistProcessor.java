@@ -1,5 +1,10 @@
 package org.dcarew.pythontools.ui.editors;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.dcarew.pythontools.core.PythonMetaData;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -10,11 +15,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 class PythonContentAssistProcessor implements IContentAssistProcessor {
 
@@ -57,7 +57,7 @@ class PythonContentAssistProcessor implements IContentAssistProcessor {
 
   @Override
   public char[] getCompletionProposalAutoActivationCharacters() {
-    return new char[] {};
+    return new char[] {'.'};
   }
 
   @Override
