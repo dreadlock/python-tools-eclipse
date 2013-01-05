@@ -4,7 +4,6 @@ import org.dcarew.pythontools.core.parser.PyNode;
 import org.dcarew.pythontools.ui.PythonUIPlugin;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -39,13 +38,13 @@ public class PythonEditorOutlinePage extends ContentOutlinePage {
 
     // TODO: do we want to do this, or let the selection synchronization handle it?
     getTreeViewer().expandToLevel(2);
+  }
 
-    getTreeViewer().addSelectionChangedListener(new ISelectionChangedListener() {
-      @Override
-      public void selectionChanged(SelectionChangedEvent event) {
-        handleTreeViewerSelectionChanged(event.getSelection());
-      }
-    });
+  @Override
+  public void selectionChanged(SelectionChangedEvent event) {
+    super.selectionChanged(event);
+
+    handleTreeViewerSelectionChanged(event.getSelection());
   }
 
   protected void handleEditorReconcilation() {

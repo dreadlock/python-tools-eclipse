@@ -14,9 +14,6 @@
 
 package org.dcarew.pythontools.ui.editors;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -27,16 +24,15 @@ import org.eclipse.jface.text.hyperlink.AbstractHyperlinkDetector;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.rules.IWordDetector;
 
-// TODO: use a word detector
-// TODO: only in the default partition type
-
 class PythonHyperlinkDetector extends AbstractHyperlinkDetector {
-  private static class MethodHyperlink implements IHyperlink {
+  private class MethodHyperlink implements IHyperlink {
     private IRegion region;
+    private int index;
     private String text;
 
-    MethodHyperlink(IRegion region, String text) {
+    MethodHyperlink(IRegion region, int index, String text) {
       this.region = region;
+      this.index = index;
       this.text = text;
     }
 
@@ -57,8 +53,7 @@ class PythonHyperlinkDetector extends AbstractHyperlinkDetector {
 
     @Override
     public void open() {
-      // TODO:
-
+      editor.selectAndReveal(index, text.length());
     }
   }
 
@@ -71,11 +66,6 @@ class PythonHyperlinkDetector extends AbstractHyperlinkDetector {
   @Override
   public IHyperlink[] detectHyperlinks(ITextViewer textViewer, IRegion region,
       boolean canShowMultipleHyperlinks) {
-    // TODO:
-    if (true) {
-      return null;
-    }
-
     if (region == null || textViewer == null || editor == null) {
       return null;
     }
@@ -100,17 +90,19 @@ class PythonHyperlinkDetector extends AbstractHyperlinkDetector {
         return null;
       }
 
-      return new IHyperlink[] {new MethodHyperlink(strRegion, document.get(strRegion.getOffset(),
-          strRegion.getLength()))};
+      String word = document.get(strRegion.getOffset(), strRegion.getLength() + 1);
 
-//      // TODO: is there a link to this symbol in the file?
-//      IFile file = getFileFor(textViewer,
-//          document.get(strRegion.getOffset(), strRegion.getLength()));
-//
-//      if (file != null) {
-//        // TODO:
-//        //return new IHyperlink[] {new FileHyperlink(strRegion, file)};
-//      }
+      if (word.endsWith("(")) {
+        word = word.substring(0, word.length() - 1);
+
+        int index = document.search(0, "def " + word + "(", true, true, false);
+
+        if (index != -1) {
+          index += 4;
+
+          return new IHyperlink[] {new MethodHyperlink(strRegion, index, word)};
+        }
+      }
     } catch (BadLocationException e) {
 
     }
@@ -150,20 +142,6 @@ class PythonHyperlinkDetector extends AbstractHyperlinkDetector {
     }
 
     return new Region(start + 1, end - start - 1);
-  }
-
-  private IFile getFileFor(ITextViewer textViewer, String path) {
-    IFile baseFile = (IFile) editor.getEditorInput().getAdapter(IFile.class);
-
-    if (baseFile != null) {
-      IResource resource = baseFile.getParent().findMember(new Path(path));
-
-      if (resource instanceof IFile && resource.exists()) {
-        return (IFile) resource;
-      }
-    }
-
-    return null;
   }
 
 }
