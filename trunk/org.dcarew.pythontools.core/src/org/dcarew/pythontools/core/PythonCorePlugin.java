@@ -29,6 +29,9 @@ public class PythonCorePlugin extends Plugin {
 
   public static final String PYLINT_CONFIG_PREF = "pylintConfigPref";
 
+  // TODO: use a system property
+  public static final boolean LOGGING = true;
+
   // The shared instance
   private static PythonCorePlugin plugin;
 
@@ -45,10 +48,22 @@ public class PythonCorePlugin extends Plugin {
     return "py".equals(file.getFileExtension());
   }
 
+  public static void logError(String message) {
+    if (getPlugin() != null) {
+      getPlugin().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
+    }
+  }
+
   public static void logError(Throwable exception) {
     if (getPlugin() != null) {
       getPlugin().getLog().log(
           new Status(IStatus.ERROR, PLUGIN_ID, exception.getMessage(), exception));
+    }
+  }
+
+  public static void logInfo(String message) {
+    if (getPlugin() != null) {
+      getPlugin().getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
     }
   }
 

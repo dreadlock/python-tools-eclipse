@@ -1,6 +1,16 @@
 package org.dcarew.pythontools.core.launching;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.dcarew.pythontools.core.PythonCorePlugin;
+import org.dcarew.pythontools.core.debugger.PyDebugTarget;
+import org.dcarew.pythontools.core.debugger.PythonDebugger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -11,16 +21,9 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
@@ -29,8 +32,16 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
   }
 
   @Override
+  public boolean buildForLaunch(ILaunchConfiguration configuration, String mode,
+      IProgressMonitor monitor) {
+    return false;
+  }
+
+  @Override
   public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch,
       IProgressMonitor monitor) throws CoreException {
+    boolean enableDebugging = ILaunchManager.DEBUG_MODE.equals(mode);
+
     String pythonPath = PythonCorePlugin.getPlugin().getPythonPath();
 
     if (pythonPath == null) {
@@ -49,8 +60,12 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
 
     List<String> commandsList = new ArrayList<String>();
 
+    // "python [pydebug.py] script"
     commandsList.add(pythonPath);
     commandsList.addAll(Arrays.asList(wrapper.getInterpreterArgumentsAsArray()));
+    if (enableDebugging) {
+      commandsList.add(PythonDebugger.getPyDebugPath());
+    }
     commandsList.add(scriptPath);
     commandsList.addAll(Arrays.asList(wrapper.getScriptArgumentsAsArray()));
 
@@ -92,28 +107,26 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
 
     //eclipseProcess.setAttribute(IProcess.ATTR_CMDLINE, generateCommandLine(commands));
 
-//    if (enableDebugging) {
-//      ServerDebugTarget debugTarget = new ServerDebugTarget(launch, eclipseProcess, connectionPort);
-//
-//      try {
-//        debugTarget.connect();
-//
-//        launch.addDebugTarget(debugTarget);
-//      } catch (DebugException ex) {
-//        // We don't throw an exception if the process died before we could connect.
-//        if (!isProcessDead(runtimeProcess)) {
-//          throw ex;
-//        }
-//      }
-//    }
+    if (enableDebugging) {
+      PyDebugTarget target = new PyDebugTarget(eclipseProcess);
+
+      try {
+        target.connect(launch, PythonDebugger.DEFAULT_PORT);
+      } catch (DebugException ex) {
+        // We don't throw an exception if the process died before we could connect.
+        if (!isProcessDead(runtimeProcess)) {
+          throw ex;
+        }
+      }
+    }
 
     monitor.done();
   }
 
   @Override
-  public boolean buildForLaunch(ILaunchConfiguration configuration, String mode,
-      IProgressMonitor monitor) {
-    return false;
+  public boolean preLaunchCheck(ILaunchConfiguration configuration, String mode,
+      IProgressMonitor monitor) throws CoreException {
+    return saveBeforeLaunch(configuration, mode, monitor);
   }
 
   @Override
@@ -136,21 +149,6 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
     return getBuildOrder(configuration, mode);
   }
 
-  @Override
-  public boolean preLaunchCheck(ILaunchConfiguration configuration, String mode,
-      IProgressMonitor monitor) throws CoreException {
-    return saveBeforeLaunch(configuration, mode, monitor);
-  }
-
-  private DebugException newDebugException(String message) {
-    return new DebugException(new Status(IStatus.ERROR, PythonCorePlugin.PLUGIN_ID, message));
-  }
-
-  private DebugException newDebugException(Throwable t) {
-    return new DebugException(
-        new Status(IStatus.ERROR, PythonCorePlugin.PLUGIN_ID, t.toString(), t));
-  }
-
   private File getCurrentWorkingDirectory(PythonLaunchConfigWrapper wrapper) {
     if (wrapper.getWorkingDirectory().length() > 0) {
       String cwd = wrapper.getWorkingDirectory();
@@ -161,6 +159,25 @@ public class PythonLaunchConfigurationDelegate extends LaunchConfigurationDelega
 
       return resource.getParent().getLocation().toFile();
     }
+  }
+
+  private boolean isProcessDead(Process process) {
+    try {
+      process.exitValue();
+
+      return true;
+    } catch (IllegalThreadStateException ex) {
+      return false;
+    }
+  }
+
+  private DebugException newDebugException(String message) {
+    return new DebugException(new Status(IStatus.ERROR, PythonCorePlugin.PLUGIN_ID, message));
+  }
+
+  private DebugException newDebugException(Throwable t) {
+    return new DebugException(
+        new Status(IStatus.ERROR, PythonCorePlugin.PLUGIN_ID, t.toString(), t));
   }
 
   private String translateToFilePath(File cwd, IResource resource) {

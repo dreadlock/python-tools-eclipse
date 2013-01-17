@@ -1,5 +1,7 @@
 package org.dcarew.pythontools.ui.editors;
 
+import java.util.ResourceBundle;
+
 import org.dcarew.pythontools.core.PythonCorePlugin;
 import org.dcarew.pythontools.core.parser.PyModule;
 import org.dcarew.pythontools.core.parser.PyNode;
@@ -9,6 +11,7 @@ import org.dcarew.pythontools.ui.PythonUIPlugin;
 import org.dcarew.pythontools.ui.preferences.PreferenceConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension3;
@@ -26,8 +29,18 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.SourceViewerDecorationSupport;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
+// TODO: mark occurrences
+
+// TODO: block comment / un-comment
+
 public class PythonEditor extends TextEditor {
   public static final String DEFAULT_INDENT = "  ";
+
+  static final String EDITOR_MARK_OCCURRENCES = "markOccurrences";
+
+  private static final String BUNDLE_ID = "org.dcarew.pythontools.ui.editors.PythonEditorMessages";
+
+  static ResourceBundle editorResourceBundle = ResourceBundle.getBundle(BUNDLE_ID);
 
   static char getEscapeCharacter(char character) {
     switch (character) {
@@ -88,8 +101,7 @@ public class PythonEditor extends TextEditor {
 
     setDocumentProvider(new PythonDocumentProvider());
 
-    // TODO: key binding scopes
-    //setKeyBindingScopes(new String[] {"com.googlecode.goclipse.editor"});
+    setKeyBindingScopes(new String[] {"org.dcarew.pythontools.ui.pythonEditorScope"});
   }
 
   @Override
@@ -166,6 +178,12 @@ public class PythonEditor extends TextEditor {
     }
 
     return DEFAULT_INDENT;
+  }
+
+  public boolean isMarkingOccurrences() {
+    IPreferenceStore store = getPreferenceStore();
+
+    return store != null && store.getBoolean(PythonEditor.EDITOR_MARK_OCCURRENCES);
   }
 
   public void selectAndReveal(PyNode node) {
