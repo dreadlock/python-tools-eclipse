@@ -6,6 +6,42 @@ import org.json.JSONObject;
 
 public class PyModule extends PyNode {
 
+  static PyModule parseJson(LineMapper lineMapper, String str) {
+    try {
+      JSONObject json = new JSONObject(str);
+
+      JSONArray arr = json.getJSONArray("children");
+      PyModule module = new PyModule();
+
+      for (int i = 0; i < arr.length(); i++) {
+        JSONObject obj = arr.getJSONObject(i);
+        String type = obj.optString("type");
+
+        if ("import".equals(type)) {
+          parseImport(lineMapper, module, obj);
+        } else if ("class".equals(type)) {
+          parseClass(lineMapper, module, obj);
+        } else if ("function".equals(type)) {
+          parseFunction(lineMapper, module, obj);
+        } else if ("assign".equals(type)) {
+          parseAssign(lineMapper, module, obj);
+        } else if ("if".equals(type)) {
+          parseIf(lineMapper, module, obj);
+        } else {
+          // TODO:
+          System.out.println("unexpected: " + obj);
+        }
+      }
+
+      return module;
+    } catch (JSONException e) {
+      // TODO:
+      e.printStackTrace();
+
+      return new PyModule();
+    }
+  }
+
   private static void parseAssign(LineMapper mapper, PyNode parent, JSONObject obj)
       throws JSONException {
     JSONObject location = obj.getJSONObject("start");
@@ -33,8 +69,8 @@ public class PyModule extends PyNode {
     for (int i = 0; i < arr.length(); i++) {
       JSONObject child = arr.getJSONObject(i);
 
-      if (child.has("function")) {
-        parseFunction(mapper, pyclass, child.getJSONObject("function"));
+      if (child.has("type") && child.optString("type").equals("function")) {
+        parseFunction(mapper, pyclass, child);
       } else {
         // TODO:
 
@@ -75,42 +111,6 @@ public class PyModule extends PyNode {
         mapper.getOffset(location.getInt("line"), location.getInt("col")), pyimport.getName()));
 
     parent.addChild(pyimport);
-  }
-
-  static PyModule parseJson(LineMapper lineMapper, String str) {
-    try {
-      JSONObject json = new JSONObject(str);
-
-      JSONArray arr = json.getJSONArray("children");
-      PyModule module = new PyModule();
-
-      for (int i = 0; i < arr.length(); i++) {
-        JSONObject obj = arr.getJSONObject(i);
-        String type = obj.optString("type");
-
-        if ("import".equals(type)) {
-          parseImport(lineMapper, module, obj);
-        } else if ("class".equals(type)) {
-          parseClass(lineMapper, module, obj);
-        } else if ("function".equals(type)) {
-          parseFunction(lineMapper, module, obj);
-        } else if ("assign".equals(type)) {
-          parseAssign(lineMapper, module, obj);
-        } else if ("if".equals(type)) {
-          parseIf(lineMapper, module, obj);
-        } else {
-          // TODO:
-          System.out.println("unexpected: " + obj);
-        }
-      }
-
-      return module;
-    } catch (JSONException e) {
-      // TODO:
-      e.printStackTrace();
-
-      return new PyModule();
-    }
   }
 
   public PyModule() {
