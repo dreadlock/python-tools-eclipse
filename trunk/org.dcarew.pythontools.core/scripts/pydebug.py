@@ -8,40 +8,32 @@ import optparse
 import os
 import socket
 import sys
+import threading
 
 dbg = None
-mainScript = None
+main_script = None
+socket_file = None
+port = None
+condition = None
 
 def ExecuteCommand(command):
-  cmd = command['command']
+  cmd_id = command['id']
+  cmd_name = command['command']
   
-  if cmd == 'run':
-    dbg.run('execfile(%r)' % mainScript)
-    #TODO: respond to the command -
-  else:
-    print 'unhandled command: %s' % command['id']
-  
-
-def EnterDispatchLoop(clientsocket):
-  f = clientsocket.makefile()
-  
-  for line in f:
-    line = line.strip()
-    command = json.loads(line)
-    ExecuteCommand(command)
+  if cmd_name == 'run':
+    SendResult(cmd_id)
     
-  return 0
+    # start the user's application running
+    condition.acquire()
+    condition.notify()
+    condition.release()
+  elif cmd_name == 'version':
+    SendResult(cmd_id, result=sys.version)
+  else:
+    print 'unhandled command: %s %s' % (cmd_name, cmd_id)
+  
 
-def StartDebugger(port, script):
-  global dbg
-  global mainScript
-  mainScript = script
-  
-  # patch up argv
-  # TODO: remove any --port option as well
-  del sys.argv[0]
-  sys.path[0] = os.path.dirname(script)
-  
+def _StartDbgThread():
   # wait for connection
   serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   serversocket.bind(('', port))
@@ -49,9 +41,57 @@ def StartDebugger(port, script):
   (clientsocket, _) = serversocket.accept()
   serversocket.close()
 
-  dbg = bdb.Bdb()
+  EnterDispatchLoop(clientsocket)
     
-  return EnterDispatchLoop(clientsocket)
+  
+def SendResult(cmd_id, result=None):
+  if not result:
+    data = '{"id":%s}\n' % cmd_id    
+  else:
+    data = '{"id":%s,"result":"%s"}\n' % (cmd_id, result)
+  socket_file.write(data)
+  socket_file.flush()
+  
+  
+def EnterDispatchLoop(clientsocket):
+  global socket_file
+  
+  socket_file = clientsocket.makefile()
+  
+  for line in socket_file:
+    line = line.strip()
+    command = json.loads(line)
+    ExecuteCommand(command)
+    
+  return 0
+
+
+def StartDebugger():
+  global dbg
+  global condition
+  
+  # patch up argv
+  # TODO: remove any --port option as well
+  del sys.argv[0]
+  sys.path[0] = os.path.dirname(main_script)
+  
+  dbg = bdb.Bdb()
+  
+  condition = threading.Condition()
+  condition.acquire()
+  
+  # start a separate thread for the debugger
+  dbg_thread = threading.Thread(target=_StartDbgThread)
+  dbg_thread.daemon = True
+  dbg_thread.start()
+  
+  condition.wait()
+  condition.release()
+  
+  # start the user's application
+  dbg.run('execfile(%r)' % main_script)
+  
+  return 0
   
 
 def BuildOptions():
@@ -61,6 +101,9 @@ def BuildOptions():
 
 
 def Main():
+  global port
+  global main_script
+  
   parser = BuildOptions()
   (options, args) = parser.parse_args()
   
@@ -72,7 +115,10 @@ def Main():
     print 'Error: %s does not exist' % args[0]
     sys.exit(1)
   
-  return StartDebugger(options.port, args[0])
+  port = options.port
+  main_script = args[0]
+  
+  return StartDebugger()
   
     
 if __name__ == '__main__':

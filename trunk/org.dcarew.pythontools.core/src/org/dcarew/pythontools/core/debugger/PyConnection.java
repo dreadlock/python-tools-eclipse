@@ -84,6 +84,16 @@ public class PyConnection {
     sendSimpleCommand("run");
   }
 
+  public void sendVersionCommand(final PyCallback<String> callback) throws IOException {
+    // sys.version
+    sendSimpleCommand("version", new Callback() {
+      @Override
+      public void handleResult(JSONObject result) throws JSONException {
+        callback.handleResult(createVersionResult(result));
+      }
+    });
+  }
+
   protected void processJson(String str) {
     try {
       JSONObject result = new JSONObject(str.trim());
@@ -104,6 +114,10 @@ public class PyConnection {
     String line = reader.readLine();
 
     while (line != null) {
+      if (PythonCorePlugin.LOGGING) {
+        System.out.println("<== " + line);
+      }
+
       processJson(line);
 
       line = reader.readLine();
@@ -154,6 +168,18 @@ public class PyConnection {
 
       throw ex;
     }
+  }
+
+  private PyResult<String> createVersionResult(JSONObject obj) throws JSONException {
+    PyResult<String> result = PyResult.createFrom(obj);
+
+    if (obj.has("result")) {
+      result.setResult(obj.getString("result"));
+    } else {
+      result.setError("no version returned");
+    }
+
+    return result;
   }
 
   private void notifyDebuggerResumed() {
@@ -208,7 +234,6 @@ public class PyConnection {
 
   private void send(String str) throws IOException {
     if (PythonCorePlugin.LOGGING) {
-      // Print the command to the VM.
       System.out.println("==> " + str.trim());
     }
 
